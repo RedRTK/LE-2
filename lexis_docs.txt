@@ -1,0 +1,3878 @@
+---
+url: /index.md
+description: Lexis Lua API documentation
+---
+
+# Welcome to the Lexis Lua documentation
+
+Whether you're a seasoned developer or just dipping your toes into Lua, this documentation is your go-to resource for navigating the Lexis Lua API.
+
+To kickstart your development experience, we highly recommend utilizing our [natives.lua](/natives.lua) file, a handy collection of game script functions. Incorporating this into your projects will not only streamline your workflow but also enhance your productivity.
+
+Please refer to our [example projects](/example.zip) if you get stuck.
+
+---
+
+---
+url: /docs/getting-started/environment.md
+description: Information on the environment around your script.
+---
+
+# Environment
+
+Information on the environment around your script.
+
+## Permissions
+
+When a script is loaded, a set of permissions are available to toggle. If you're using certain game mechanics, such as running transactions, it's recommended to check that permissions were given first.
+
+### Permission Layout
+
+| Flag | Purpose |
+|-----------|---------|
+| `natives` | Calling natives |
+| `global_read` | Reading script globals |
+| `global_write` | Writing script globals |
+| `local_read` | Reading script locals |
+| `local_write` | Writing script locals |
+| `memory_read` | Reading game memory |
+| `memory_write` | Writing game memory |
+| `https` | Sending web requests |
+| `file_read` | Reading files |
+| `file_write` | Writing files |
+| `stat_read` | Reading stats |
+| `stat_write` | Writing stats |
+| `transactions` | Running transactions |
+
+::: info Note
+In most cases, attempting to use a function without permissions will either do nothing or return an empty state.
+:::
+
+```lua
+if this.permissions() & permission.transactions == 0 then
+  print('Exiting script, need transactions')
+  this.unload()
+  return
+end
+```
+
+## JOAAT
+
+If you're looking for a faster method of hashing text using the games native hashing method (JOAAT), you can use `joaat`.
+
+```lua
+local hash = joaat('adder')
+```
+
+---
+
+---
+url: /docs/api/constants.md
+---
+
+# Constants
+
+Common constants exposed to Lua scripts.
+
+## node\_data\_type
+
+```lua
+node_data_type.int8
+node_data_type.int16
+node_data_type.int32
+node_data_type.int64
+node_data_type.uint8
+node_data_type.uint16
+node_data_type.uint32
+node_data_type.uint64
+node_data_type.float
+node_data_type.double
+node_data_type.bool
+node_data_type.vec2
+node_data_type.vec3
+node_data_type.bytes
+```
+
+## net\_object
+
+```lua
+net_object.automobile
+net_object.bike
+net_object.boat
+net_object.door
+net_object.heli
+net_object.object
+net_object.ped
+net_object.pickup
+net_object.pickup_placement
+net_object.plane
+net_object.submarine
+net_object.player
+net_object.trailer
+net_object.train
+```
+
+## data\_node
+
+```lua
+data_node.automobile_creation
+data_node.bike_game_state
+data_node.boat_game_state
+data_node.door_creation
+data_node.door_movement
+data_node.door_script_game_state
+data_node.door_script_info
+data_node.dynamic_entity_game_state
+data_node.entity_orientation
+data_node.entity_script_game_state
+data_node.entity_script_info
+data_node.global_flags
+data_node.heli_control
+data_node.heli_health
+data_node.migration
+data_node.object_creation
+data_node.object_game_state
+data_node.object_orientation
+data_node.object_script_game_state
+data_node.object_sector_pos
+data_node.patrol
+data_node.ped_ai_data
+data_node.ped_appearance
+data_node.ped_attach
+data_node.ped_component_reservation
+data_node.ped_creation
+data_node.ped_game_state
+data_node.ped_health
+data_node.ped_inventory
+data_node.ped_movement
+data_node.ped_movement_group
+data_node.ped_orientation
+data_node.ped_script_creation
+data_node.ped_script_game_state
+data_node.ped_sector_pos_map
+data_node.ped_sector_pos_nav_mesh
+data_node.ped_task_sequence
+data_node.ped_task_specific
+data_node.ped_task_tree
+data_node.physical_ang_velocity
+data_node.physical_attach
+data_node.physical_game_state
+data_node.physical_health
+data_node.physical_migration
+data_node.physical_script_game_state
+data_node.physical_script_migration
+data_node.physical_velocity
+data_node.pickup_creation
+data_node.pickup_placement_creation
+data_node.pickup_placement_state
+data_node.pickup_script_game_state
+data_node.pickup_sector_pos
+data_node.plane_control
+data_node.plane_game_state
+data_node.player_ambient_model_streaming
+data_node.player_appearance
+data_node.player_camera
+data_node.player_creation
+data_node.player_extended_game_state
+data_node.player_game_state
+data_node.player_gamer
+data_node.player_ped_group
+data_node.player_sector_pos
+data_node.player_wanted_and_los
+data_node.sector
+data_node.sector_position
+data_node.submarine_control
+data_node.submarine_game_state
+data_node.train_game_state
+data_node.vehicle_ang_velocity
+data_node.vehicle_appearance
+data_node.vehicle_component_reservation
+data_node.vehicle_control
+data_node.vehicle_creation
+data_node.vehicle_damage_status
+data_node.vehicle_gadget
+data_node.vehicle_game_state
+data_node.vehicle_health
+data_node.vehicle_proximity_migration
+data_node.vehicle_script_game_state
+data_node.vehicle_steering
+data_node.vehicle_task
+```
+
+---
+
+---
+url: /docs/api/lexis.md
+---
+
+# Lexis
+
+Reference for the `lexis` API.
+
+## Functions
+
+### lexis.username
+
+Your Lexis username.
+
+```lua
+function lexis.username(): string
+```
+
+### lexis.version
+
+The lexis version (e.g., "10.1.0").
+
+```lua
+function lexis.version(): string
+```
+
+## Examples
+
+```lua
+notify.push('My Script', 'Hello, ' .. lexis.username())
+```
+
+---
+
+---
+url: /docs/api/game.md
+---
+
+# Game
+
+Reference for the `game` API.
+
+## Functions
+
+### game.is\_session\_free\_roam
+
+If you're in a free roam session (i.e, not in a mission).
+
+```lua
+function game.is_session_free_roam(): bool
+```
+
+### game.in\_game
+
+If you're loaded into a game.
+
+```lua
+function game.in_game(): bool
+```
+
+### game.net\_obj\_from\_id
+
+Net object memory address retrieved via an entity net id.
+
+```lua
+---@param net_id integer
+function game.net_obj_from_id(net_id): memory_address
+```
+
+### game.net\_obj\_from\_entity
+
+Net object memory address retrieved via an entity handle.
+
+```lua
+---@param entity integer
+function game.net_obj_from_entity(entity): memory_address
+```
+
+### game.update\_net\_obj\_owner
+
+Updates the owner of an entity.
+
+```lua
+---@param entity integer
+---@param new_owner_player_id integer
+function game.update_net_obj_owner(entity, new_owner_player_id): bool
+```
+
+### game.entity\_from\_guid
+
+Entity memory address retrieved via an entity handle.
+
+```lua
+---@param entity integer
+function game.entity_from_guid(entity): memory_address
+```
+
+### game.guid\_from\_entity
+
+Entity handle retrieved via an entity address.
+
+```lua
+---@param entity integer|memory_address
+function game.guid_from_entity(entity): integer
+```
+
+### game.send\_friend\_request
+
+Sends a friend request to an account.
+
+```lua
+---@param rockstar_id integer
+function game.send_friend_request(rockstar_id): nil
+```
+
+### game.is\_sc\_ui\_showing
+
+If the Social Club UI is open.
+
+```lua
+function game.is_sc_ui_showing(): bool
+```
+
+### game.is\_transaction\_busy
+
+If there's an active basket transaction processing.
+
+```lua
+function game.is_transaction_busy(): bool
+```
+
+### game.sync\_tree
+
+Sync tree memory address retrieved via a net object type (0-13).
+
+```lua
+---@param type net_object|integer
+function game.sync_tree(type): memory_address
+```
+
+### game.state
+
+The current state of the game.
+
+```lua
+function game.state(): integer
+```
+
+### game.resolution
+
+The game window resolution.
+
+```lua
+function game.resolution(): vec2
+```
+
+### game.delta
+
+The game delta.
+
+```lua
+function game.delta(): number
+```
+
+### game.host
+
+The session host as a player.
+
+```lua
+function game.host(): player
+```
+
+### game.basket\_transaction
+
+Processes a basket transaction.
+
+```lua
+---@param category integer
+---@param action integer
+---@param destination integer
+---@param items table[] { id, extra_inventory_id, price, stat, quantity }
+function game.basket_transaction(category, action, destination, items): nil
+```
+
+### game.invite\_rockstar\_id
+
+Invites a player to your session.
+
+```lua
+---@param rockstar_id integer|integer[]
+function game.invite_rockstar_id(rockstar_id): nil
+```
+
+### game.get\_model\_info
+
+Model info memory address retrieved via the model.
+
+```lua
+---@param model string|integer 
+function game.get_model_info(model): memory_address
+```
+
+### game.is\_ptfx\_playing\_at\_coords
+
+Checks if a particle effect is playing at a position.
+
+```lua
+---@param asset string 
+---@param effect string 
+---@param coords vec3 
+---@param radius? number
+function game.is_ptfx_playing_at_coords(asset, effect, coords, radius?): bool
+```
+
+### game.network\_unregister\_entity
+
+Force deletes an entity on the network.
+
+```lua
+---@param handle integer 
+---@param locally? boolean
+function game.network_unregister_entity(handle, locally?): nil
+```
+
+### game.local\_unregister\_entity
+
+Force deletes an entity locally.
+
+```lua
+---@param handle integer 
+function game.local_unregister_entity(handle): nil
+```
+
+### game.version
+
+Returns the game version (e.g., "1013.34").
+
+```lua
+function game.version(): string
+```
+
+### game.online\_version
+
+Returns the online version (e.g., "1.72").
+
+```lua
+function game.online_version(): string
+```
+
+### game.build
+
+Returns "Legacy" or "Enhanced".
+
+```lua
+function game.build(): string
+```
+
+## Examples
+
+```lua
+-- add $15M to the bank (2 for bank, 1 for wallet) !! detected !!
+game.basket_transaction(joaat('CATEGORY_SERVICE_WITH_THRESHOLD'), joaat('NET_SHOP_ACTION_EARN'), 2, { { joaat('SERVICE_EARN_BEND_JOB'), 1, 15000000, 0, 1 } })
+
+-- print your ped address
+print('CPed: ' .. tostring(game.entity_from_guid(players.me().ped)).value)
+
+-- check for a particle at a position
+local is_playing = game.is_ptfx_playing_at_coords('scr_indep_fireworks', 'scr_indep_firework_fountain', vec3(1178.653, 2666.179, 37.881), 2.0)
+```
+
+---
+
+---
+url: /docs/api/notify.md
+---
+
+# Notify
+
+Reference for the `notify` API.
+
+## Functions
+
+### notify.push
+
+Pushes a notification to the queue.
+
+```lua
+---@param title string
+---@param desc string
+---@param options? { time: number, icon: notify.icon }
+function notify.push(title, desc, options?): nil
+```
+
+### notify.clear
+
+Clears the notify queue.
+
+```lua
+function notify.clear(): nil
+```
+
+## Constants
+
+### icon
+
+```lua
+notify.icon.info
+notify.icon.modder
+notify.icon.player_join
+notify.icon.player_leave
+notify.icon.protections
+notify.icon.spawner
+notify.icon.hotkey
+notify.icon.hazard
+notify.icon.player_spawn
+notify.icon.spoofing
+notify.icon.join_failed
+notify.icon.join_blocking
+notify.icon.tracking
+```
+
+## Examples
+
+```lua
+notify.push('My Script', 'Test from my script!', { time=10000, icon=notify.icon.hazard })
+notify.push('My Script', 'Test from my script!') -- defaults to { time=6000, icon=notify.icon.info }
+```
+
+---
+
+---
+url: /docs/api/request.md
+---
+
+# Request
+
+Reference for the `request` API.
+
+::: warning
+These options are blocking, it's recommended to call inside of a thread or job.
+:::
+
+## Functions
+
+### request.control
+
+Requests control of an entity.
+
+```lua
+---@param entity integer
+---@param force_ownership? bool
+function request.control(entity, force_ownership?): bool
+```
+
+### request.model
+
+Requests a model to be loaded.
+
+```lua
+---@param model string|integer
+function request.model(model): bool
+```
+
+### request.weapon
+
+Requests a weapon to be loaded.
+
+```lua
+---@param model string|integer
+function request.weapon(model): bool
+```
+
+### request.dict
+
+Requests a dictionary to be loaded.
+
+```lua
+---@param dictionary string
+function request.dict(dictionary): bool
+```
+
+### request.anim
+
+Requests an animation to be loaded.
+
+```lua
+---@param animation string
+function request.anim(animation): bool
+```
+
+### request.particle
+
+Requests a particle to be loaded.
+
+```lua
+---@param particle string
+function request.particle(particle): bool
+```
+
+## Examples
+
+```lua
+local natives = require('natives')
+
+util.create_job(function()
+  local hash = joaat('player_two')
+  if request.model(hash) then
+    natives.set_player_model(players.me().id, hash)
+  end
+end)
+```
+
+---
+
+---
+url: /docs/api/util.md
+---
+
+# Util
+
+Reference for the `util` API.
+
+::: tip
+Yielding at the end of a thread or job is not necessary.
+:::
+
+## Functions
+
+### util.create\_thread
+
+Create a thread that'll be called each frame, returning a thread id.
+
+```lua
+---@param callback function()
+function util.create_thread(callback): integer
+```
+
+### util.remove\_thread
+
+Delete a thread using the id returned from `create_thread`.
+
+```lua
+---@param id integer
+function util.remove_thread(id): nil
+```
+
+### util.create\_job
+
+Create a job that'll be called once.
+
+```lua
+---@param callback function()
+function util.create_job(callback): nil
+```
+
+### util.yield
+
+Yield the current callback.
+
+```lua
+---@param time_ms? integer
+function util.yield(time_ms?): nil
+```
+
+### util.get\_tick\_count
+
+Tick count returned from `GetTickCount()`.
+
+```lua
+function util.get_tick_count(): integer
+```
+
+### util.str\_split
+
+Tokenize a string and returns the tokens.
+
+```lua
+---@param str string
+---@param delimiter string
+function util.str_split(str, delimiter): string[]
+```
+
+### util.str\_random
+
+Returns a random string of `length`.
+
+```lua
+---@param length integer
+function util.str_random(length): string
+```
+
+### util.str\_bytes
+
+Returns a hex string as a list of bytes (`FFFF` to `{ 255, 255 }`)
+
+```lua
+---@param str string
+function util.str_bytes(str): integer[]
+```
+
+### util.number\_bytes
+
+Returns a 4 byte integer as bytes (little endian).
+
+```lua
+---@param num integer
+function util.number_bytes(num): integer[]
+```
+
+### util.random\_int
+
+Returns a random integer between `min` and `max`.
+
+```lua
+---@param min integer
+---@param max integer
+function util.random_int(min, max): integer
+```
+
+### util.random\_float
+
+Returns a random float (`number`) between `min` and `max`.
+
+```lua
+---@param min number
+---@param max number
+function util.random_float(min, max): number
+```
+
+## Examples
+
+```lua
+local natives = require('natives')
+
+-- called once
+util.create_job(function()
+  local hash = joaat('player_two')
+  if request.model(hash) then
+    natives.set_player_model(players.me().id, hash)
+  end
+end)
+
+-- called per frame
+local id = util.create_thread(function()
+  gui.rect(vec2(100.0, 100.0), vec2(100.0, 100.0))
+    :filled()
+    :color(color(255, 255, 255, 100))
+    :draw()
+end)
+
+-- deletes the thread after 5s
+util.create_job(function()
+  util.yield(5000)
+  util.remove_thread(id)
+end)
+
+local tokens = util.str_split('this is a nice string', ' ')
+print(tokens[1]) -- 'this'
+```
+
+---
+
+---
+url: /docs/api/events.md
+---
+
+# Events
+
+Reference for the `events` API.
+
+## Functions
+
+### events.subscribe
+
+Register a callback to be fired when the event is handled, returning a callback id.
+
+```lua
+---@param type events.event
+---@param callback function(data)
+function events.subscribe(type, callback): integer
+```
+
+### events.unsubscribe
+
+Delete a callback using the id returned from `subscribe`.
+
+```lua
+---@param id integer
+function events.unsubscribe(id): nil
+```
+
+### events.get
+
+Returns an `event` for a given callback id.
+
+```lua
+---@param id integer
+function events.get(id): event
+```
+
+## Types
+
+### event
+
+| Field | Type |
+| --- | --- |
+| `enabled` | `bool` |
+| `fn` | `function` |
+
+### player\_join
+
+| Field | Type |
+| --- | --- |
+| `player` | `player` |
+| `slot` | `integer` |
+
+### player\_leave
+
+| Field | Type |
+| --- | --- |
+| `player` | `player` |
+| `slot` | `integer` |
+
+### player\_flagged
+
+| Field | Type |
+| --- | --- |
+| `player` | `player` |
+| `reason` | `string` |
+
+### log
+
+| Field | Type |
+| --- | --- |
+| `text` | `string` |
+| `color` | `color` |
+| `prefix` | `string` |
+| `time` | `string` |
+
+### scroll
+
+| Field | Type |
+| --- | --- |
+| `offset` | `number` |
+
+### key\_press
+
+| Field | Type |
+| --- | --- |
+| `key` | `integer` |
+
+### char\_press
+
+| Field | Type |
+| --- | --- |
+| `char` | `string` |
+
+## Constants
+
+### event
+
+```lua
+events.event.player_join
+events.event.player_leave
+events.event.player_flagged
+events.event.log
+events.event.scroll
+events.event.key_press
+events.event.char_press
+```
+
+## Examples
+
+```lua
+events.subscribe(events.event.key_press, function(data)
+  print('key pressed: ' .. tostring(data.key))
+end)
+
+events.subscribe(events.event.char_press, function(data)
+  print('char pressed: ' .. data.char)
+end)
+
+events.subscribe(events.event.scroll, function(data)
+  print('scroll: ' .. tostring(data.offset))
+end)
+```
+
+---
+
+---
+url: /docs/api/input.md
+---
+
+# Input
+
+Reference for the `input` API.
+
+## Functions
+
+### input.show\_cursor
+
+Show the mouse cursor.
+
+```lua
+---@param show bool
+function input.show_cursor(show): nil
+```
+
+### input.disable\_input
+
+Disable input to Lexis.
+
+```lua
+---@param disable bool
+function input.disable_input(disable): nil
+```
+
+### input.key
+
+Get a key state.
+
+```lua
+---@param vk integer
+function input.key(vk): input_keyboard_state
+```
+
+### input.mouse
+
+Get a mouse key state.
+
+```lua
+---@param vk integer
+function input.mouse(vk): input_mouse_state
+```
+
+### input.pad
+
+Get a controller key state.
+
+```lua
+---@param key integer
+function input.pad(key): input_pad_state
+```
+
+### input.mouse\_position
+
+Get the position of the mouse cursor.
+
+```lua
+function input.mouse_position(): vec2
+```
+
+### input.is\_mouse\_within
+
+If the mouse cursor is within a given bounds.
+
+```lua
+---@param position vec2
+---@param scale vec2
+function input.is_mouse_within(position, scale): bool
+```
+
+### input.get\_clipboard\_text
+
+Get the text in your clipboard.
+
+```lua
+function input.get_clipboard_text(): string
+```
+
+### input.set\_clipboard\_text
+
+Set your clipboard text.
+
+```lua
+---@param str string
+function input.set_clipboard_text(str): nil
+```
+
+## Types
+
+### input\_keyboard\_state
+
+| Field | Type |
+| --- | --- |
+| `pressed` | `bool` |
+| `just_pressed` | `bool` |
+| `just_released` | `bool` |
+| `name` | `string` |
+
+### input\_mouse\_state
+
+| Field | Type |
+| --- | --- |
+| `double_clicked` | `bool` |
+| `pressed` | `bool` |
+| `just_pressed` | `bool` |
+| `just_released` | `bool` |
+| `name` | `string` |
+
+### input\_pad\_state
+
+| Field | Type |
+| --- | --- |
+| `pressed` | `bool` |
+| `just_pressed` | `bool` |
+| `just_released` | `bool` |
+
+## Examples
+
+```lua
+INPUT_ATTACK = 0x18
+VK_W = 0x57
+VK_LEFT_MOUSE = 0x01
+
+print('w just pressed: ', input.key(VK_W).just_pressed)
+print('left mouse being held: ', input.mouse(VK_LEFT_MOUSE).pressed)
+print('mouse position: ', input.mouse_position())
+print('attacking: ', input.pad(INPUT_ATTACK).pressed)
+```
+
+---
+
+---
+url: /docs/api/regex.md
+---
+
+# Regex
+
+Reference for the `regex` API.
+
+## Functions
+
+### regex
+
+Create a `regex` instance with a given pattern.
+
+```lua
+---@param pattern string
+function regex(pattern): regex
+```
+
+## Types
+
+### find\_all
+
+```lua
+---@param subject string
+function regex:find_all(subject): string[][]
+```
+
+## Examples
+
+```lua
+local r = regex('a*b')
+print(r.find_all('aaab aab ab')) -- {{"aaab"}, {"aab"}, {"ab"}}
+```
+
+---
+
+---
+url: /docs/api/math.md
+---
+
+# Math
+
+Reference for the `math` API.
+
+## Functions
+
+### vec2
+
+Different ways to create a `vec2`.
+
+```lua
+function vec2(): vec2
+
+---@param xy number
+function vec2(xy): vec2
+
+---@param x number
+---@param y number
+function vec2(x, y): vec2
+```
+
+### vec3
+
+Different ways to create a `vec3`.
+
+```lua
+function vec3(): vec3
+
+---@param xyz number
+function vec3(xyz): vec3
+
+---@param x number
+---@param y number
+---@param z number
+function vec3(x, y, z): vec3
+```
+
+### scr\_vec3
+
+Different ways to create a `scr_vec3`.
+
+```lua
+function scr_vec3(): scr_vec3
+
+---@param xyz number
+function scr_vec3(xyz): scr_vec3
+
+---@param x number
+---@param y number
+---@param z number
+function scr_vec3(x, y, z): scr_vec3
+```
+
+## Types
+
+### vec2
+
+| Field | Type |
+| --- | --- |
+| `x` | `number` |
+| `y` | `number` |
+
+```lua
+function vec2:normalize(): vec2
+
+---@param other vec2
+function vec2:dot(other): number
+```
+
+### vec3
+
+| Field | Type |
+| --- | --- |
+| `x` | `number` |
+| `y` | `number` |
+| `z` | `number` |
+
+```lua
+function vec3:normalize(): vec3
+function vec3:dir(): vec3
+
+---@param other vec3
+function vec3:dot(other): number
+
+---@param other vec3
+function vec3:distance3d(other): number
+```
+
+### scr\_vec3
+
+| Field | Type |
+| --- | --- |
+| `x` | `number` |
+| `y` | `number` |
+| `z` | `number` |
+
+```lua
+function scr_vec3:normalize(): scr_vec3
+function scr_vec3:dir(): scr_vec3
+
+---@param other scr_vec3
+function scr_vec3:dot(other): number
+
+---@param other scr_vec3
+function scr_vec3:distance3d(other): number
+```
+
+## Examples
+
+```lua
+local coords = vec3(-76.09, -818.93, 326.17) -- maze bank top
+print('distance: ', tostring(coords.distance3d(players.me().coords)))
+```
+
+---
+
+---
+url: /docs/api/invoker.md
+---
+
+# Invoker
+
+Reference for the `invoker` API.
+
+## Functions
+
+### invoker.call
+
+Invoke a native.
+
+```lua
+---@param hash integer
+---@param args? ...
+function invoker.call(hash, args?): native_invoke
+```
+
+## Types
+
+### native\_invoke
+
+| Field | Type |
+| --- | --- |
+| `int` | `integer` |
+| `int64` | `integer` |
+| `float` | `number` |
+| `bool` | `bool` |
+| `str` | `string` |
+| `address` | `memory_address` |
+| `scr_vec3` | `scr_vec3` |
+| `params` | `scr_value` |
+
+## Examples
+
+```lua
+local ptr = pointer_scr_vec3()
+util.create_thread(function()
+  local ped = invoker.call(0xD80958FC74E988A6).int -- PLAYER_PED_ID
+  local coords = invoker.call(0x3FEF770D40960D5A, ped, false).scr_vec3 -- GET_ENTITY_COORDS
+  invoker.call(0xF2A1B2771A01DBD4, coords.x, coords.y, coords.z, 0, 255.0, 0, 1000.0, 1.0) -- DRAW_LIGHT_WITH_RANGE
+
+  if native.get_ped_last_weapon_impact_coord(ped, ptr) then
+    print(tostring(ptr.value.x) .. ', ' .. tostring(ptr.value.y) .. ', ' .. tostring(ptr.value.z))
+  end
+end)
+```
+
+---
+
+---
+url: /docs/api/http.md
+---
+
+# HTTP
+
+Reference for the `http` API.
+
+::: warning
+The `fetch` function is blocking.
+:::
+
+## Functions
+
+### http.fetch
+
+Fetch data from a URL.
+
+```lua
+---@param url string
+---@param options { method: string, headers: table<string, string>[], body: string|integer[]|json }
+function http.fetch(url, options): http_result
+```
+
+### http.fetch\_async
+
+Fetch data from a URL async.
+
+```lua
+---@param url string
+---@param options { method: string, headers: table<string, string>[], body: string|integer[]|json }
+---@param callback function(http_result)
+function http.fetch_async(url, options, callback): bool
+```
+
+## Types
+
+### http\_result
+
+| Field | Type |
+| --- | --- |
+| `success` | `bool` |
+| `status` | `integer` |
+| `error` | `integer` |
+| `headers` | `table<string, string>[]` |
+| `body` | `integer[]` |
+| `text` | `string` |
+| `json` | `table` |
+
+## Examples
+
+```lua
+local result = http.fetch('https://pastebin.com/raw/kNAcSPLC', { method='GET' })
+if result.success then
+  print(result.text)
+end
+
+http.fetch_async('https://pastebin.com/raw/kNAcSPLC', { method='GET' }, function(data)
+  print('data:' .. data.text)
+end)
+```
+
+---
+
+---
+url: /docs/api/scapi.md
+---
+
+# SC API
+
+Reference for the `scapi` API.
+
+::: warning
+The `query` function is blocking, it's recommended to call inside of a thread or job.
+:::
+
+## Functions
+
+### scapi.query
+
+Fetch data for an account.
+
+```lua
+---@param rid integer
+function scapi.query(rid): scapi_rockstar_account
+
+---@param name string
+---@param page? integer
+function scapi.query(name, page?): scapi_account_pagination
+```
+
+## Types
+
+### scapi\_rockstar\_account
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `rid` | `integer` |
+| `success` | `bool` |
+
+### scapi\_result\_info
+
+| Field | Type |
+| --- | --- |
+| `total` | `integer` |
+| `next_page` | `integer` |
+| `query` | `string` |
+
+### scapi\_account\_pagination
+
+| Field | Type |
+| --- | --- |
+| `accounts` | `scapi_rockstar_account[]` |
+| `paged` | `scapi_result_info` |
+| `success` | `bool` |
+
+## Examples
+
+```lua
+function query_accounts(name, page)
+  local scinfo = scapi.query(name, page)
+  if scinfo.success then
+    for i, account in ipairs(scinfo.accounts) do
+      print('name: ', account.name)
+    end
+
+    if scinfo.paged.next_page > 0 then
+      query_accounts(name, scinfo.paged.next_page)
+    end
+  end
+end
+
+query_accounts('Rockstar', 0)
+
+local scinfo = scapi.query(1)
+if scinfo.success then
+  print('Name:', scinfo.name)
+end
+```
+
+---
+
+---
+url: /docs/api/pools.md
+---
+
+# Pools
+
+Reference for the `pools` API.
+
+## Functions
+
+### pools.ped
+
+Returns a list of ped memory addresses.
+
+```lua
+---@param require_valid_guid? bool
+function pools.ped(require_valid_guid?): memory_address[]
+```
+
+### pools.object
+
+Returns a list of object memory addresses.
+
+```lua
+---@param require_valid_guid? bool
+function pools.object(require_valid_guid?): memory_address[]
+```
+
+### pools.vehicle
+
+Returns a list of vehicle memory addresses.
+
+```lua
+---@param require_valid_guid? bool
+function pools.vehicle(require_valid_guid?): memory_address[]
+```
+
+### pools.weapon
+
+Returns a list of weapon memory addresses.
+
+```lua
+function pools.weapon(require_valid_guid?): memory_address[]
+```
+
+### pools.pickup
+
+Returns a list of pickup memory addresses.
+
+```lua
+---@param require_valid_guid? bool
+function pools.pickup(require_valid_guid?): memory_address[]
+```
+
+## Examples
+
+```lua
+for index, address in ipairs(pools.ped()) do
+  local handle = game.guid_from_entity(address)
+  if handle ~= 0 then
+    local coords = invoker.call(0x3FEF770D40960D5A, handle, false).scr_vec3 -- GET_ENTITY_COORDS
+    print('entity: ', tostring(handle), ', address: ', tostring(address.value), ', coords: ', coords)
+  end
+end
+```
+
+---
+
+---
+url: /docs/api/account.md
+---
+
+# Account
+
+Reference for the `account` API.
+
+## Functions
+
+### account.character
+
+Returns your active character.
+
+```lua
+function account.character(): integer
+```
+
+### account.name
+
+Returns your account name.
+
+```lua
+function account.name(): string
+```
+
+### account.rockstar\_id
+
+Returns your account rockstar ID.
+
+```lua
+function account.rockstar_id(): integer
+```
+
+### account.stats
+
+Creates an instance of `stat`.
+
+```lua
+---@param name string|integer
+function account.stats(name): stat
+```
+
+## Types
+
+### stat
+
+| Field | Type |
+| --- | --- |
+| `str` | `string` |
+| `int32` | `integer` |
+| `int64` | `integer` |
+| `uint8` | `integer` |
+| `uint16` | `integer` |
+| `uint32` | `integer` |
+| `uint64` | `integer` |
+| `float` | `number` |
+| `bool` | `bool` |
+
+## Examples
+
+```lua
+local stat = account.stats('MP' .. tostring(account.character()) .. '_CHAR_SET_RP_GIFT_ADMIN')
+print('current: ', stat.int32)
+
+stat.int32 = 1555800 -- level 99
+```
+
+---
+
+---
+url: /docs/api/json.md
+---
+
+# JSON
+
+Reference for the `json` API.
+
+## Functions
+
+### json.encode
+
+Encodes a table into an instance of `json`.
+
+```lua
+---@param data table
+function json.encode(data): json
+```
+
+### json.decode
+
+Decodes an instance of `json` into a table.
+
+```lua
+---@param json json
+function json.decode(json): table
+```
+
+## Types
+
+### json
+
+```lua
+---@param indent? integer
+function json:dump(indent?): string
+```
+
+## Examples
+
+```lua
+local data = {a=1, name='test'}
+local json = json.encode(data)
+print(json:dump()) -- '{ "a": 1, "name": "test" }'
+```
+
+---
+
+---
+url: /docs/api/paths.md
+---
+
+# Paths
+
+Reference for the `paths` API.
+
+## Constants
+
+```lua
+paths.cheat
+paths.game
+paths.script
+```
+
+## Examples
+
+```lua
+print(paths.cheat) -- 'C:\Users\<username>\Lexis\'
+print(paths.game) -- 'C:\Users\<username>\Lexis\Grand Theft Auto V'
+print(paths.script) -- 'C:\Users\<username>\Lexis\scripts\my_script\'
+```
+
+---
+
+---
+url: /docs/api/dirs.md
+---
+
+# Dirs
+
+Reference for the `dirs` API.
+
+::: warning
+Paths are limited to the Lexis folder, trying to use a path in another directory will fail.
+:::
+
+## Functions
+
+### dirs.list
+
+Returns a list of files in the directory.
+
+```lua
+---@param path string
+---@param extension? string
+function dirs.list(path, extension?): string[]
+```
+
+### dirs.scan
+
+Returns a list of directories in the directory.
+
+```lua
+---@param path string
+function dirs.scan(path): string[]
+```
+
+### dirs.exists
+
+If a directory exists.
+
+```lua
+---@param path string
+function dirs.exists(path): bool
+```
+
+### dirs.remove
+
+Deletes a directory.
+
+```lua
+---@param path string
+function dirs.remove(path): bool
+```
+
+### dirs.create
+
+Creates a directory.
+
+```lua
+---@param path string
+function dirs.create(path): bool
+```
+
+---
+
+---
+url: /docs/api/file.md
+---
+
+# File
+
+Reference for the `file` API.
+
+::: warning
+Paths are limited to the Lexis folder, trying to use a path in another directory will fail.
+:::
+
+## Functions
+
+### file.exists
+
+If a file exists.
+
+```lua
+---@param path string
+function file.exists(path): bool
+```
+
+### file.remove
+
+Deletes a file.
+
+```lua
+---@param path string
+function file.remove(path): bool
+```
+
+### file.open
+
+Deletes a file.
+
+```lua
+---@param path string
+---@param options { append: bool, create_if_not_exists: bool }
+function file.open(path, options): file
+```
+
+## Types
+
+### file
+
+| Field | Type |
+| --- | --- |
+| `valid` | `bool` |
+| `text` | `string` |
+| `json` | `json` |
+
+## Examples
+
+```lua
+local handle = file.open(paths.cheat .. 'test.txt', { create_if_not_exists: true })
+if handle.valid then
+  handle.text = 'this is test text'
+end
+```
+
+---
+
+---
+url: /docs/api/script.md
+---
+
+# Script
+
+Reference for the `script` API.
+
+## Functions
+
+### script.running
+
+If a script is running.
+
+```lua
+---@param name string|integer
+function script.running(name): bool
+```
+
+### script.globals
+
+Creates an instance of `script_global`.
+
+```lua
+---@param base integer
+function script.globals(base): script_global
+```
+
+### script.tunables
+
+Creates an instance of `tunables`.
+
+```lua
+---@param name string|integer
+function script.tunables(name): tunables
+```
+
+### script.locals
+
+Creates an instance of `script_local`.
+
+```lua
+---@param name string|integer
+---@param base integer
+function script.locals(name, base): script_local
+```
+
+### script.program
+
+Script program memory address retrieved via the script name.
+
+```lua
+---@param name string|integer
+function script.program(name): memory_address
+```
+
+### script.host
+
+Returns a `player` for the host of the given script.
+
+```lua
+---@param name string
+function script.host(name): player
+```
+
+### script.force\_host
+
+Force host of a script.
+
+```lua
+---@param script string|integer
+function script.force_host(script): bool
+```
+
+### script.call
+
+Calls a script function via its function offset.
+
+```lua
+---@param name string|integer
+---@param position integer
+---@param args table
+function script.call(name, position, args): memory_address
+```
+
+### script.patch
+
+Creates a script patch.
+
+```lua
+---@param name string|integer
+---@param position integer
+---@param offset integer
+---@param bytes integer[]
+function script.patch(name, position, offset, bytes): script_patch
+```
+
+### script.execute\_as
+
+Run a callback as a script.
+
+```lua
+---@param name string|integer
+---@param callback function
+function script.execute_as(name, callback): nil
+```
+
+## Types
+
+### script\_global
+
+| Field | Type |
+| --- | --- |
+| `address` | `memory_address` |
+| `vec2` | `vec2` |
+| `vec3` | `scr_vec3` |
+| `int8` | `integer` |
+| `int16` | `integer` |
+| `int32` | `integer` |
+| `int64` | `integer` |
+| `uint8` | `integer` |
+| `uint16` | `integer` |
+| `uint32` | `integer` |
+| `uint64` | `integer` |
+| `float` | `number` |
+| `double` | `number` |
+| `bool` | `bool` |
+| `str` | `string` |
+
+```lua
+---@param index integer
+function script_global:at(index): script_global
+
+---@param index integer
+---@param size integer
+function script_global:at(index, size): script_global
+```
+
+### script\_local
+
+| Field | Type |
+| --- | --- |
+| `address` | `memory_address` |
+| `vec2` | `vec2` |
+| `vec3` | `scr_vec3` |
+| `int8` | `integer` |
+| `int16` | `integer` |
+| `int32` | `integer` |
+| `int64` | `integer` |
+| `uint8` | `integer` |
+| `uint16` | `integer` |
+| `uint32` | `integer` |
+| `uint64` | `integer` |
+| `float` | `number` |
+| `double` | `number` |
+| `bool` | `bool` |
+| `str` | `string` |
+
+```lua
+---@param index integer
+function script_local:at(index): script_local
+
+---@param index integer
+---@param size integer
+function script_local:at(index, size): script_local
+```
+
+### script\_patch
+
+| Field | Type |
+| --- | --- |
+| `enabled` | `bool` |
+| `original` | `integer[]` |
+| `patch` | `integer[]` |
+
+```lua
+function script_patch:enable(): nil
+function script_patch:disable(): nil
+```
+
+### tunables
+
+| Field | Type |
+| --- | --- |
+| `int8` | `integer` |
+| `int16` | `integer` |
+| `int32` | `integer` |
+| `int64` | `integer` |
+| `uint8` | `integer` |
+| `uint16` | `integer` |
+| `uint32` | `integer` |
+| `uint64` | `integer` |
+| `float` | `number` |
+| `double` | `number` |
+| `bool` | `bool` |
+
+## Examples
+
+```lua
+function get_owned_property(index, character)
+  local result = script.call('freemode', 0xAA7B7, {index, character})
+  return result and result.int32 or 0
+end
+
+script.globals(2672741):at(3694).bool = true
+script.locals('am_mp_drone', 197):at(245).int32 = 0
+```
+
+---
+
+---
+url: /docs/api/memory.md
+---
+
+# Memory
+
+Reference for the `memory` API.
+
+## Functions
+
+### memory.base
+
+Returns the base address of the game.
+
+```lua
+function memory.base(): integer
+```
+
+### memory.size
+
+Returns the size (in memory) of the game.
+
+```lua
+function memory.size(): integer
+```
+
+### memory.alloc
+
+Allocates memory.
+
+```lua
+---@param size integer
+function memory.alloc(size): memory_allocated
+```
+
+### memory.scan
+
+Scans memory for a signature.
+
+```lua
+---@param signature string
+---@param module? string
+function memory.scan(signature, module?): memory_address
+```
+
+## Types
+
+### pointer\_int
+
+| Field | Type |
+| --- | --- |
+| `value` | `integer` |
+
+```lua
+---@param count? integer
+function pointer_int(count?): pointer_int
+
+function pointer_int:free(): nil
+function pointer_int:address(): memory_address
+```
+
+### pointer\_bool
+
+| Field | Type |
+| --- | --- |
+| `value` | `bool` |
+
+```lua
+---@param count? integer
+function pointer_bool(count?): pointer_bool
+
+function pointer_bool:free(): nil
+function pointer_bool:address(): memory_address
+```
+
+### pointer\_float
+
+| Field | Type |
+| --- | --- |
+| `value` | `number` |
+
+```lua
+---@param count? integer
+function pointer_float(count?): pointer_float
+
+function pointer_float:free(): nil
+function pointer_float:address(): memory_address
+```
+
+### pointer\_scr\_value
+
+| Field | Type |
+| --- | --- |
+| `value` | `scr_value` |
+
+```lua
+---@param count? integer
+function pointer_scr_value(count?): pointer_scr_value
+
+function pointer_scr_value:free(): nil
+function pointer_scr_value:address(): memory_address
+```
+
+### pointer\_vec3
+
+| Field | Type |
+| --- | --- |
+| `value` | `vec3` |
+
+```lua
+---@param count? integer
+function pointer_vec3(count?): pointer_vec3
+
+function pointer_vec3:free(): nil
+function pointer_vec3:address(): memory_address
+```
+
+### pointer\_scr\_vec3
+
+| Field | Type |
+| --- | --- |
+| `value` | `scr_vec3` |
+
+```lua
+---@param count? integer
+function pointer_scr_vec3(count?): pointer_scr_vec3
+
+function pointer_scr_vec3:free(): nil
+function pointer_scr_vec3:address(): memory_address
+```
+
+### memory\_address
+
+| Field | Type |
+| --- | --- |
+| `value` | `integer` |
+| `int8` | `integer` |
+| `as_int8` | `integer` |
+| `int16` | `integer` |
+| `as_int16` | `integer` |
+| `int32` | `integer` |
+| `as_int32` | `integer` |
+| `int64` | `integer` |
+| `as_int64` | `integer` |
+| `uint8` | `integer` |
+| `as_uint8` | `integer` |
+| `uint16` | `integer` |
+| `as_uint16` | `integer` |
+| `uint32` | `integer` |
+| `as_uint32` | `integer` |
+| `uint64` | `integer` |
+| `as_uint64` | `integer` |
+| `float` | `number` |
+| `as_float` | `number` |
+| `double` | `number` |
+| `as_double` | `number` |
+| `bool` | `bool` |
+| `as_bool` | `bool` |
+| `ptr` | `memory_address` |
+| `as_ptr` | `memory_address` |
+| `scr_vec3` | `scr_vec3` |
+| `as_scr_vec3` | `scr_vec3` |
+| `vec2` | `vec2` |
+| `as_vec2` | `vec2` |
+| `vec3` | `vec3` |
+| `as_vec3` | `vec3` |
+| `str` | `string` |
+| `as_str` | `string` |
+
+```lua
+---@param count? integer
+function memory_address:nop(count?): nil
+
+---@param offset integer
+function memory_address:add(offset): memory_address
+
+---@param offset integer
+function memory_address:sub(offset): memory_address
+
+---@param op_size? integer
+---@param insn_size? integer
+function memory_address:rip(op_size?, insn_size?): memory_address
+```
+
+### scr\_value
+
+| Field | Type |
+| --- | --- |
+| `int32` | `integer` |
+| `uint32` | `integer` |
+| `uint64` | `integer` |
+| `float` | `number` |
+| `bool` | `bool` |
+| `str` | `string` |
+| `ref` | `scr_value` |
+
+### memory\_allocated
+
+```lua
+function memory_allocated:free(): nil
+```
+
+---
+
+---
+url: /docs/api/gui.md
+---
+
+# GUI
+
+Reference for the `gui` API.
+
+## Functions
+
+### gui.push\_clip
+
+Pushes a clip rect.
+
+```lua
+---@param pos vec2
+---@param scale vec2
+function gui.push_clip(pos, scale): nil
+```
+
+### gui.pop\_clip
+
+Pops a clip rect.
+
+```lua
+function gui.pop_clip(): nil
+```
+
+### gui.line
+
+Draws a 2D line.
+
+```lua
+---@param from vec2
+---@param to vec2
+---@param thickness number
+---@param color color
+function gui.line(from, to, thickness, color): nil
+```
+
+### gui.circle
+
+Draws a circle.
+
+```lua
+---@param pos vec2
+---@param radius number
+---@param color color
+function gui.circle(pos, radius, color): nil
+```
+
+### gui.image
+
+Draws an image.
+
+```lua
+---@param texture texture
+---@param pos vec2
+---@param scale vec2
+---@param color color
+function gui.image(texture, pos, scale, color): nil
+```
+
+### gui.image\_rounded
+
+Draws a rounded image.
+
+```lua
+---@param texture texture
+---@param pos vec2
+---@param scale vec2
+---@param color color
+---@param rounding number
+---@param flags gui.rounding|integer
+function gui.image_rounded(texture, pos, scale, color, rounding?, flags?): nil
+```
+
+### gui.image\_rotated
+
+Draws a rotated image.
+
+```lua
+---@param texture texture
+---@param pos vec2
+---@param scale vec2
+---@param color color
+---@param degrees number
+function gui.image_rotated(texture, pos, scale, color, degrees): nil
+```
+
+### gui.rebuild
+
+Rebuild the font atlas.
+
+```lua
+function gui.rebuild(): nil
+```
+
+### gui.load\_image
+
+Loads an image.
+
+```lua
+---@param path string
+function gui.load_image(path): texture
+```
+
+### gui.load\_font
+
+Loads a font.
+
+```lua
+---@param path string
+---@param scale number
+function gui.load_font(path, scale): font
+```
+
+### gui.text
+
+Creates an instance of `text`.
+
+```lua
+---@param str string
+function gui.text(str): text
+```
+
+### gui.rect
+
+Creates an instance of `rect`.
+
+```lua
+---@param pos vec2
+---@param scale vec2
+function gui.rect(pos, scale): rect
+```
+
+### gui.text\_size
+
+Gets the width and height of some text.
+
+```lua
+---@param text string
+---@param scale number
+---@param options? { wrap: number, font: font }
+function gui.text_size(text, scale, options?): vec2
+```
+
+## Types
+
+### text
+
+```lua
+function text:draw(): text
+function text:get_size(): vec2
+
+---@param pos vec2
+function text:position(pos): text
+
+---@param color color
+function text:color(color): text
+
+---@param wrap number
+function text:wrap(wrap): text
+
+---@param scale number
+function text:scale(scale): text
+
+---@param justify gui.justify
+function text:justify(justify): text
+
+---@param font font
+function text:font(font): text
+```
+
+### rect
+
+```lua
+function rect:draw(): rect
+function rect:filled(): rect
+
+---@param color color
+function rect:color(color): rect
+
+---@param thickness number
+---@param color color
+function rect:outline(thickness, color): rect
+
+---@param rounding number
+---@param flags? gui.rounding|integer
+function rect:rounding(rounding, flags?): rect
+
+---@param upr_left color
+---@param upr_right color
+---@param bot_right color
+---@param bot_left color
+function rect:multicolors(upr_left, upr_right, bot_right, bot_left): rect
+```
+
+### color
+
+| Field | Type |
+| --- | --- |
+| `r` | `integer` |
+| `g` | `integer` |
+| `b` | `integer` |
+| `rf` | `number` |
+| `gf` | `number` |
+| `bf` | `number` |
+
+### texture
+
+| Field | Type |
+| --- | --- |
+| `scale` | `vec2` |
+| `name` | `string` |
+| `path` | `string` |
+
+### font
+
+| Field | Type |
+| --- | --- |
+| `scale` | `number` |
+| `path` | `string` |
+
+## Constants
+
+### justify
+
+```lua
+gui.justify.left
+gui.justify.center
+gui.justify.right
+```
+
+### rounding
+
+```lua
+gui.rounding.top_left
+gui.rounding.top_right
+gui.rounding.bottom_left
+gui.rounding.bottom_right
+```
+
+## Examples
+
+```lua
+util.create_thread(function()
+  gui.rect(vec2(100.0, 100.0), vec2(100.0, 100.0))
+    :filled()
+    :color(color(255, 255, 255, 100))
+    :draw()
+
+  gui.text('test')
+    :position(vec2(100.0, 100.0))
+    :color(color(255, 255, 255, 100))
+    :draw()
+end)
+```
+
+---
+
+---
+url: /docs/api/menu.md
+---
+
+# Menu
+
+Reference for the `menu` API.
+
+::: tip
+Combo and number options have their states indexed when added in a player root (see example below).
+:::
+
+## Functions
+
+### menu.root
+
+Returns the submenu instance for your scripts dedicated submenu inside of the `Scripts` submenu.
+
+```lua
+function menu.root(): submenu
+```
+
+### menu.player\_root
+
+Returns the submenu instance for your scripts dedicated submenu for each player.
+
+```lua
+function menu.player_root(): submenu
+```
+
+### menu.find
+
+Finds an option in the menu via a hierarchy path.
+
+```lua
+---@param path string
+function menu.find(path): option
+```
+
+### menu.iter
+
+Returns a tree of all menu options, preserving hierarchy and order.
+
+```lua
+function menu.iter(): menu_node[]
+```
+
+### menu.type\_of
+
+Returns the name of an option object, else "unknown"
+
+```lua
+---@param object option
+function menu.type_of(object): string
+```
+
+## Types
+
+### menu\_node
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `handle` | `option` |
+| `options` | `menu_node[]?` |
+
+### submenu
+
+| Field | Type |
+| --- | --- |
+| `first_option_index` | `integer` |
+| `options` | `option[]` |
+
+```lua
+---@param name string
+---@param insert_at? integer
+function submenu:submenu(name, insert_at?): submenu
+
+---@param name string
+---@param insert_at? integer
+function submenu:toggle(name, insert_at?): toggle
+
+---@param name string
+---@param key? integer
+---@param insert_at? integer
+function submenu:hotkey(name, key?, insert_at?): hotkey
+
+---@param name string
+---@param insert_at? integer
+function submenu:textbox(name, insert_at?): textbox
+
+---@param name string
+---@param insert_at? integer
+function submenu:button(name, insert_at?): button
+
+---@param name string
+---@param insert_at? integer
+function submenu:breaker(name, insert_at?): breaker
+
+---@param name string
+---@param type? menu.type|integer
+---@param insert_at? integer
+function submenu:number_int(name, type?, insert_at?): number_int
+
+---@param name string
+---@param type? menu.type|integer
+---@param insert_at? integer
+function submenu:number_float(name, type?, insert_at?): number_float
+
+---@param name string
+---@param values table
+---@param type menu.type|integer
+---@param multi? bool
+---@param insert_at? integer
+function submenu:combo_int(name, values, type, multi?, insert_at?): combo_int
+
+---@param name string
+---@param values table
+---@param type menu.type|integer
+---@param multi? bool
+---@param insert_at? integer
+function submenu:combo_float(name, values, type, multi?, insert_at?): combo_float
+
+---@param name string
+---@param values table
+---@param type menu.type|integer
+---@param multi? bool
+---@param insert_at? integer
+function submenu:combo_str(name, values, type, multi?, insert_at?): combo_str
+
+---@param new_size integer
+function submenu:resize(new_size): nil
+```
+
+### textbox
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `value` | `string` |
+
+```lua
+---@param text string
+function textbox:tooltip(text): textbox
+
+---@param flag menu.flags
+function textbox:flags(flags): textbox
+
+---@param event menu.event
+---@param fn function(textbox)
+function textbox:event(event, fn): textbox
+
+---@param chars integer
+function textbox:max_chars(chars): textbox
+
+function textbox:invoke(): textbox
+```
+
+### toggle
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `value` | `bool` |
+
+```lua
+---@param text string
+function toggle:tooltip(text): toggle
+
+---@param flag menu.flags
+function toggle:flags(flags): toggle
+
+---@param event menu.event
+---@param fn function(toggle)
+function toggle:event(event, fn): toggle
+
+function toggle:invoke(): toggle
+```
+
+### hotkey
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `value` | `integer` |
+
+```lua
+---@param text string
+function hotkey:tooltip(text): hotkey
+
+---@param flag menu.flags
+function hotkey:flags(flags): hotkey
+
+---@param event menu.event
+---@param fn function
+function hotkey:event(event, fn): hotkey
+
+function hotkey:invoke(): hotkey
+```
+
+### breaker
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+
+```lua
+---@param text string
+function breaker:tooltip(text): breaker
+
+---@param flag menu.flags
+function breaker:flags(flags): breaker
+
+---@param event menu.event
+---@param fn function(breaker)
+function breaker:event(event, fn): breaker
+
+function breaker:invoke(): breaker
+```
+
+### button
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+
+```lua
+---@param text string
+function button:tooltip(text): button
+
+---@param flag menu.flags
+function button:flags(flags): button
+
+---@param event menu.event
+---@param fn function(button)
+function button:event(event, fn): button
+
+function button:invoke(): button
+```
+
+### number\_int
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `sub_type` | `menu.sub_type` |
+| `slider` | `menu.slider` |
+| `value` | `integer` |
+| `toggle` | `bool` |
+
+```lua
+---@param text string
+function number_int:tooltip(text): number_int
+
+---@param flag menu.flags
+function number_int:flags(flags): number_int
+
+---@param event menu.event
+---@param fn function(number_int)
+function number_int:event(event, fn): number_int
+
+---@param fmt string
+---@param min integer
+---@param max integer
+---@param step? integer
+function number_int:fmt(fmt, min, max, step?): number_int
+
+---@param step integer
+function number_int:step(step): number_int
+
+function number_int:invoke(): number_int
+```
+
+### number\_float
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `sub_type` | `menu.sub_type` |
+| `slider` | `menu.slider` |
+| `value` | `number` |
+| `toggle` | `bool` |
+
+```lua
+---@param text string
+function number_float:tooltip(text): number_float
+
+---@param flag menu.flags
+function number_float:flags(flags): number_float
+
+---@param event menu.event
+---@param fn function(number_float)
+function number_float:event(event, fn): number_float
+
+---@param fmt string
+---@param min number
+---@param max number
+---@param step? number
+function number_float:fmt(fmt, min, max, step?): number_float
+
+---@param step number
+function number_float:step(step): number_float
+
+function number_float:invoke(): number_float
+```
+
+### combo\_int
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `sub_type` | `menu.sub_type` |
+| `slider` | `menu.slider` |
+| `value` | `integer` |
+| `toggle` | `bool` |
+| `list` | `combo_list_int` |
+| `multi` | `combo_multi_list` |
+
+```lua
+---@param text string
+function combo_int:tooltip(text): combo_int
+
+---@param flag menu.flags
+function combo_int:flags(flags): combo_int
+
+---@param event menu.event
+---@param fn function(combo_int)
+function combo_int:event(event, fn): combo_int
+
+function combo_int:invoke(): combo_int
+```
+
+### combo\_float
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `sub_type` | `menu.sub_type` |
+| `slider` | `menu.slider` |
+| `value` | `number` |
+| `toggle` | `bool` |
+| `list` | `combo_list_float` |
+| `multi` | `combo_multi_list` |
+
+```lua
+---@param text string
+function combo_float:tooltip(text): combo_float
+
+---@param flag menu.flags
+function combo_float:flags(flags): combo_float
+
+---@param event menu.event
+---@param fn function(combo_float)
+function combo_float:event(event, fn): combo_float
+
+function combo_float:invoke(): combo_float
+```
+
+### combo\_str
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `menu.type` |
+| `sub_type` | `menu.sub_type` |
+| `slider` | `menu.slider` |
+| `value` | `string` |
+| `toggle` | `bool` |
+| `list` | `combo_list_str` |
+| `multi` | `combo_multi_list` |
+
+```lua
+---@param text string
+function combo_str:tooltip(text): combo_str
+
+---@param flag menu.flags
+function combo_str:flags(flags): combo_str
+
+---@param event menu.event
+---@param fn function(combo_str)
+function combo_str:event(event, fn): combo_str
+
+function combo_str:invoke(): combo_str
+```
+
+### combo\_list\_int
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `value` | `integer` |
+
+```lua
+---@param index integer
+function combo_list_int:at(index): combo_list_int
+```
+
+### combo\_list\_float
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `value` | `number` |
+
+```lua
+---@param index integer
+function combo_list_float:at(index): combo_list_float
+```
+
+### combo\_list\_str
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `value` | `string` |
+
+```lua
+---@param index integer
+function combo_list_str:at(index): combo_list_str
+```
+
+### combo\_multi\_list
+
+| Field | Type |
+| --- | --- |
+| `count` | `integer` |
+
+```lua
+---@param index integer
+function combo_multi_list:is_set(index): bool
+
+---@param index integer
+---@param value bool
+function combo_multi_list:set(index, value): nil
+
+---@param index integer
+function combo_multi_list:is_disabled(index): bool
+
+---@param index integer
+---@param value bool
+function combo_multi_list:disable(index, value): nil
+```
+
+## Constants
+
+### flags
+
+```lua
+menu.flags.in_game
+menu.flags.hotkey
+menu.flags.host_only
+menu.flags.scr_host_only
+menu.flags.risky
+menu.flags.disabled
+menu.flags.fake_radio
+menu.flags.fake_submenu
+menu.flags.command
+```
+
+### event
+
+```lua
+menu.event.click
+menu.event.completed
+menu.event.enter
+menu.event.leave
+```
+
+### slider
+
+```lua
+menu.slider.scroll
+menu.slider.press
+menu.slider.toggle
+```
+
+### type
+
+```lua
+menu.type.submenu
+menu.type.button
+menu.type.toggle
+menu.type.color
+menu.type.number
+menu.type.combo
+menu.type.text
+menu.type.breaker
+menu.type.radio
+menu.type.label
+menu.type.hotkey
+menu.type.multi_combo
+```
+
+### sub\_type
+
+```lua
+menu.sub_type.integer
+menu.sub_type.floating
+menu.sub_type.str
+menu.sub_type.boolean
+menu.sub_type.vec2
+menu.sub_type.vec3
+menu.sub_type.scr_vec3
+menu.sub_type.color
+```
+
+## Examples
+
+```lua
+local root = menu.root()
+local player_root = menu.player_root()
+
+-- modify an existing option
+local noclip_opt = menu.find('Player > Movement > Noclip')
+if noclip_opt then
+  noclip_opt.toggle = true
+end
+
+-- add options to existing submenus
+local player_submenu = menu.find('Player')
+local player_opt_index = player_submenu.first_option_index;
+
+player_submenu:button('First Extra Option', player_opt_index)
+player_submenu:button('Second Extra Option', player_opt_index + 1)
+
+-- add options to network players
+player_root:button('notify')
+  :event(menu.event.click, function(opt)
+    if players.is_target_session() then
+      notify.push('cool script', 'session is selected', { icon = notify.icon.hazard })
+    else
+      notify.push('cool script', players.target().name, { icon = notify.icon.hazard })
+    end
+  end)
+
+-- add options to your own dedicated submenu in Scripts
+local self_menu = root:submenu('Self')
+
+self_menu:button('resize')
+  :event(menu.event.click, function(opt)
+    self_menu:resize(2)
+  end)
+
+self_menu:button('test loop')
+  :event(menu.event.click, function(opt)
+    local start_time = os.clock()
+    while true do
+      print('test')
+
+      if os.clock() - start_time >= 3 then
+        return
+      end
+
+      util:yield()
+    end
+  end)
+
+self_menu:number_int('int number opt', menu.slider.scroll)
+  :fmt('%i', 0, 100)
+  :event(menu.event.click, function(opt)
+    print('value was changed to ' .. opt.value)
+  end)
+
+self_menu:number_float('float number opt', menu.slider.scroll)
+  :fmt('%.2f', 0.0, 100.0)
+  :event(menu.event.click, function(opt)
+    print('value was changed to ' .. opt.value)
+  end)
+
+local combo_int_list = { { 'name1', 123 }, { 'name2', 43 } }
+self_menu:combo_int('int combo opt', combo_int_list, menu.slider.press)
+  :event(menu.event.click, function(opt)
+    print('index: ' .. opt.value)
+    print('pressed: ' .. opt.list:at(opt.value).name)
+  end)
+
+local combo_float_list = { { 'n1', 12.34 }, { 'n2', 99.19 }, { 'n3', 12.44 } }
+self_menu:combo_float('float combo multi opt', combo_float_list, menu.slider.press, true) -- true signals that this combo is a "multi" type, where each index can be toggled
+  :event(menu.event.click, function(opt)
+    print('index: ' .. opt.value)
+    print('count: ' .. #combo_float_list)
+    for i = 1, #combo_float_list do
+      print(type(i))
+      print('i:' .. i)
+      print('index: ', i, 'set: ', opt.multi:is_set(i))
+
+      if opt.multi:is_set(i) then
+        print('\tname: ', combo_float_list[i][1])
+      end
+    end
+  end)
+```
+
+---
+
+---
+url: /docs/api/players.md
+---
+
+# Players
+
+Reference for the `players` API.
+
+## Functions
+
+### players.me
+
+Return your local `player`.
+
+```lua
+function players.me(): player
+```
+
+### players.target
+
+Return the selected `player` from inside Lexis.
+
+```lua
+function players.target(): player
+```
+
+### players.is\_target\_session
+
+If the current Lexis player target is the session.
+
+```lua
+function players.is_target_session(): bool
+```
+
+### players.get
+
+Return a `player` via index.
+
+```lua
+---@param index integer
+function players.get(index): player
+```
+
+### players.list
+
+Return a list of `player` for each player in the session.
+
+```lua
+function players.list(): player[]
+```
+
+## Types
+
+### player
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `id` | `integer` |
+| `ped` | `integer` |
+| `ped_ptr` | `memory_address` |
+| `vehicle` | `integer` |
+| `vehicle_ptr` | `memory_address` |
+| `weapon_entity` | `integer` |
+| `weapon_ptr` | `memory_address` |
+| `entity` | `integer` |
+| `entity_ptr` | `memory_address` |
+| `model` | `integer` |
+| `vehicle_model` | `integer` |
+| `weapon_model` | `integer` |
+| `last_synced_model` | `integer` |
+| `heading` | `number` |
+| `coords` | `scr_vec3` |
+| `rotation` | `scr_vec3` |
+| `cam_rotation` | `scr_vec3` |
+| `waypoint` | `vec2` |
+| `net_player` | `memory_address` |
+| `connected` | `bool` |
+| `exists` | `bool` |
+| `alive` | `bool` |
+| `in_vehicle` | `bool` |
+| `weapon_in_hand` | `bool` |
+| `shooting` | `bool` |
+| `driver` | `bool` |
+| `aiming` | `bool` |
+| `active_bounty` | `bool` |
+| `freemode_host` | `bool` |
+| `friend` | `bool` |
+| `controller` | `bool` |
+| `modder` | `bool` |
+| `bounty` | `integer` |
+| `rank` | `integer` |
+| `cash` | `integer` |
+| `bank` | `integer` |
+| `wallet` | `integer` |
+| `kd` | `number` |
+| `playtime` | `integer` |
+| `blacklist` | `integer` |
+| `force_entity_sync` | `bool` |
+| `rockstar_id` | `integer` |
+| `ip_address` | `integer` |
+| `in_ceo` | `bool` |
+| `boss` | `bool` |
+| `host_token` | `integer` |
+| `in_interior` | `bool` |
+| `gang_id` | `integer` |
+
+```lua
+---@param object memory_address
+---@param type net_object|integer
+---@param node data_node|integer
+function player:force_sync_node(object, type, node): nil
+
+---@param coords vec3|scr_vec3
+function player:teleport(coords): nil
+
+---@param event_hash integer
+---@param params table
+function player:script_event(event_hash, params): nil
+
+---@param type net_object|integer
+---@param node data_node|integer
+---@param mods table
+function player:modify_outgoing_node(type, node, mods): nil
+```
+
+## Examples
+
+```lua
+local target = players.target()
+
+mods = {}
+mods[0x119] = {node_data_type.bool, true}
+
+target:modify_outgoing_node(net_object.automobile, data_node.vehicle_control, mods)
+target:force_sync_node(game.net_obj_from_entity(players.me().vehicle), net_object.automobile, data_node.vehicle_control)
+```
+
+---
+
+---
+url: /docs/api/ros.md
+---
+
+# ROS
+
+Reference for the `ros` API.
+
+::: warning
+Some functions might require you to be online.
+:::
+
+## Functions
+
+### ros.find\_gamers
+
+Find gamers by activity.
+
+```lua
+---@param activity_id? integer @ default: 1
+---@param lower_limit? number @ default: 0
+---@param upper_limit? number @ default: 0
+function ros.find_gamers(activity_id?, lower_limit?, upper_limit?): find_gamer_result[]
+
+---@param callback function(find_gamer_result[])
+---@param activity_id? integer @ default: 1
+---@param lower_limit? number @ default: 0
+---@param upper_limit? number @ default: 0
+function ros.find_gamers_async(callback, activity_id?, lower_limit?, upper_limit?): nil
+```
+
+### ros.find\_sessions
+
+Find matchmaking sessions.
+
+```lua
+---@param available_slots? integer @ default: 1
+---@param max_results? integer @ default: 15
+function ros.find_sessions(available_slots?, max_results?): find_session_result[]
+
+---@param callback function(find_session_result[])
+---@param available_slots? integer @ default: 1
+---@param max_results? integer @ default: 15
+function ros.find_sessions_async(callback, available_slots?, max_results?): nil
+```
+
+### ros.query\_session
+
+Query session info by Rockstar ID(s).
+
+```lua
+---@param rockstar_id integer
+function ros.query_session(rockstar_id): query_session_result
+
+---@param rockstar_ids integer[]
+function ros.query_session(rockstar_ids): query_session_result[]
+
+---@param rockstar_id integer
+---@param callback function(query_session_result)
+function ros.query_session_async(rockstar_id, callback): nil
+
+---@param rockstar_ids integer[]
+---@param callback function(query_session_result[])
+function ros.query_session_async(rockstar_ids, callback): nil
+```
+
+### ros.query\_stats
+
+Query player stats by hash.
+
+```lua
+---@param rockstar_id integer
+---@param stats integer[]
+function ros.query_stats(rockstar_id, stats): query_stats_result[]
+
+---@param rockstar_ids integer[]
+---@param stats integer[]
+function ros.query_stats(rockstar_ids, stats): table<integer, query_stats_result[]>[]
+
+---@param rockstar_id integer
+---@param stats integer[]
+---@param callback function(query_stats_result[])
+function ros.query_stats_async(rockstar_id, stats, callback)
+
+---@param rockstar_ids integer[]
+---@param stats integer[]
+---@param callback function(table<integer, query_stats_result[]>[])
+function ros.query_stats_async(rockstar_ids, stats, callback)
+```
+
+## Types
+
+### find\_gamer\_result
+
+| Field | Type |
+| --- | --- |
+| `gsinfo` | `string` |
+| `name` | `string` |
+| `rid` | `integer` |
+
+### find\_session\_result
+
+| Field | Type |
+| --- | --- |
+| `match_id` | `string` |
+| `owner` | `string` |
+| `gsinfo` | `string` |
+| `attributes` | `string` |
+
+### query\_session\_result
+
+| Field | Type |
+| --- | --- |
+| `rid` | `integer` |
+| `gstype` | `integer` |
+| `gsinfo` | `string` |
+
+### query\_stats\_result
+
+| Field | Type |
+| --- | --- |
+| `hash` | `integer` |
+| `number`` | `integer\ |
+
+## Examples
+
+```lua
+local gamers = ros.find_gamers()
+for _, gamer in ipairs(gamers) do
+  print(gamer.name, gamer.rid)
+end
+
+ros.query_session_async(rockstar_id, function(results)
+  for _, session in ipairs(results) do
+    print(session.gsinfo)
+  end
+end)
+
+local stats = ros.query_stats(rockstar_id, { joaat('MP0_WALLET_BALANCE'), joaat('MP1_WALLET_BALANCE') })
+for _, stat in ipairs(stats) do
+  print(stat.hash, stat.value)
+end
+```
+
+---
+
+---
+url: /docs/api/models.md
+---
+
+# Models
+
+Reference for the `models` API.
+
+## Functions
+
+### models.peds
+
+Returns a list of ped models.
+
+```lua
+---@param limit? integer
+function models.peds(limit?): number[]
+```
+
+### models.weapons
+
+Returns a list of weapon models.
+
+```lua
+---@param limit? integer
+function models.weapons(limit?): number[]
+```
+
+### models.vehicles
+
+Returns a list of vehicle models.
+
+```lua
+---@param limit? integer
+function models.vehicles(limit?): number[]
+```
+
+### models.vehicles\_from\_dlc
+
+Returns a list of vehicle models from a DLC.
+
+```lua
+---@param name string
+function models.vehicles_from_dlc(name): number[]
+```
+
+### models.vehicles\_from\_class
+
+Returns a list of vehicle models from a class.
+
+```lua
+---@param class models.vehicle
+function models.vehicles_from_class(class): number[]
+```
+
+## Constants
+
+### vehicle
+
+```lua
+models.vehicle.compacts
+models.vehicle.sedans
+models.vehicle.suvs
+models.vehicle.coupes
+models.vehicle.muscle
+models.vehicle.sports_classics
+models.vehicle.sports
+models.vehicle.super
+models.vehicle.motorcycles
+models.vehicle.off_road
+models.vehicle.industrial
+models.vehicle.utility
+models.vehicle.vans
+models.vehicle.cycles
+models.vehicle.boats
+models.vehicle.helicopters
+models.vehicle.planes
+models.vehicle.service
+models.vehicle.emergency
+models.vehicle.military
+models.vehicle.commercial
+models.vehicle.trains
+models.vehicle.open_wheel
+```
+
+### dlc
+
+```lua
+"A Safehouse in The Hills"
+"Money Fronts"
+"Expanded & Enhanced"
+"Agents of Sabotage"
+"Bottom Dollar Bounties"
+"The Chop Shop"
+"San Andreas Mercenaries"
+"Los Santos Drug Wars"
+"The Criminal Enterprises"
+"The Contract"
+"Los Santos Tuners"
+"The Cayo Perico Heist"
+"Los Santos Summer"
+"The Diamond Casino Heist"
+"The Diamond Casino & Resort"
+"Arena War"
+"After Hours"
+"Southern San Andreas Super Sport Series"
+"The Doomsday Heist"
+"Smuggler's Run"
+"Gunrunning"
+"Cunning Stunts: Special Vehicle Circuit"
+"Import/Export"
+"Bikers"
+"Cunning Stunts"
+"Further Adventures In Finance & Felony"
+"Lowriders: Custom Classics"
+"Be My Valentine"
+"Drop Zone"
+"Festive Surprise 2015"
+"Executives & Other Criminals"
+"Halloween Surprise"
+"Lowriders"
+"Ill-Gotten Gains Part 2"
+"Ill-Gotten Gains Part 1"
+"Heists"
+"Festive Surprise"
+"Last Team Standing"
+"San Andreas Flight School"
+"Independence Day"
+"I'm Not a Hipster"
+"The High Life"
+"Business"
+"Valentine's Day Massacre"
+"Beach Bum"
+```
+
+## Examples
+
+```lua
+print('super vehicle count: ' .. tostring(#models.vehicles_from_class(models.vehicle.super)))
+print('money fronts vehicle count: ' .. tostring(#models.vehicles_from_dlc('Money Fronts')))
+print('total vehicle count: ' .. tostring(#models.vehicles()))
+print('ped count: ' .. tostring(#models.peds()))
+print('weapon count: ' .. tostring(#models.weapons()))
+```
+
+---
+
+---
+url: /docs/api/hook.md
+---
+
+# Hook
+
+Reference for the `hook` API.
+
+## Functions
+
+### hook.native
+
+Hooks a script native.
+
+```lua
+---@param event menu.event
+---@param script string|integer
+---@param options { pre: function(native_invoke), post: function(native_invoke) }
+function hook.native(native_hash, script, options): native_hook
+```
+
+### hook.script
+
+Hooks a script function.
+
+```lua
+---@param script string|integer
+---@param position integer
+---@param options { pre: function(params, params_size, returns, returns_size), post: function(returns, returns_size) }
+function hook.script(script, position, options): script_hook
+```
+
+## Types
+
+### native\_hook
+
+| Field | Type |
+| --- | --- |
+| `enabled` | `bool` |
+
+### script\_hook
+
+| Field | Type |
+| --- | --- |
+| `enabled` | `bool` |
+
+## Constants
+
+### event
+
+```lua
+hook.scripts.continue
+hook.scripts.block
+```
+
+## Examples
+
+```lua
+function pre_hook_stat_set_int(context)
+  local script_name = invoker.call(0x442E0A7EDE4A738A).str -- get_this_script_name
+  print('setting stat ' .. tostring(context.params[0].int32) .. ' to ' .. tostring(context.params[1].int32) .. ' in ' .. script_name)
+  return hook.scripts.continue
+end
+
+function post_hook_stat_set_int(context)
+  print('set stat result: ' .. tostring(context.bool))
+  context.bool = true -- force it to always think it succeeded
+end
+
+function pre_network_request_cash_transaction(params, params_size, returns, returns_size)
+  local transaction_type = params[1].int32
+  local action_slot = params[2].int32
+  local category = params[3].int32
+  local service = params[4].int32
+  local cost = params[5].int32
+
+  print('NETWORK_REQUEST_CASH_TRANSACTION: type=' .. tostring(transaction_type) .. ' slot=' .. tostring(action_slot) .. ' category=' .. tostring(category) .. ' service=' .. tostring(service) .. ' cost=' ..tostring(cost))
+  return hook.scripts.continue
+end
+
+hook.script('freemode', 0xBEFF4, { pre=pre_network_request_cash_transaction })
+
+-- empty script hash hooks every script
+hook.native(0xB3271D7AB655B441, 0, { pre=pre_hook_stat_set_int, post=post_hook_stat_set_int })
+```
+
+---
+
+---
+url: /docs/api/openssl.md
+---
+
+# OpenSSL
+
+Reference for the `openssl` API.
+
+::: tip
+All data parameters accept both strings and byte arrays (`integer[]`). Return values are binary-safe strings. Use `openssl.hex_encode()` or `openssl.base64_encode()` to convert binary output to readable text.
+:::
+
+::: warning
+Functions do not throw on error. Instead, they return an empty string (or `nil` for table returns). Always check `openssl.success()` after a call, and use `openssl.last_error()` to get the error message.
+:::
+
+## Functions
+
+### openssl.success
+
+Returns whether the last `openssl` call succeeded.
+
+```lua
+function openssl.success(): bool
+```
+
+### openssl.last\_error
+
+Returns the error message from the last failed `openssl` call, or an empty string if the last call succeeded.
+
+```lua
+function openssl.last_error(): string
+```
+
+### openssl.encrypt
+
+Encrypt data using a symmetric cipher. Returns an empty string on failure.
+
+```lua
+---@param algorithm string
+---@param key string|integer[]
+---@param data string|integer[]
+---@param iv? string|integer[]
+function openssl.encrypt(algorithm, key, data, iv?): string
+```
+
+### openssl.decrypt
+
+Decrypt data using a symmetric cipher. Returns an empty string on failure.
+
+```lua
+---@param algorithm string
+---@param key string|integer[]
+---@param data string|integer[]
+---@param iv? string|integer[]
+function openssl.decrypt(algorithm, key, data, iv?): string
+```
+
+### openssl.encrypt\_gcm
+
+Encrypt data using a GCM mode cipher. Returns a table containing `data` (ciphertext) and `tag` (authentication tag), or `nil` on failure.
+
+```lua
+---@param algorithm string
+---@param key string|integer[]
+---@param data string|integer[]
+---@param iv string|integer[]
+---@param aad? string|integer[]
+---@param tag_len? integer
+function openssl.encrypt_gcm(algorithm, key, data, iv, aad?, tag_len?): { data: string, tag: string }|nil
+```
+
+### openssl.decrypt\_gcm
+
+Decrypt data using a GCM mode cipher. Verifies the authentication tag. Returns an empty string on failure.
+
+```lua
+---@param algorithm string
+---@param key string|integer[]
+---@param data string|integer[]
+---@param iv string|integer[]
+---@param tag string|integer[]
+---@param aad? string|integer[]
+function openssl.decrypt_gcm(algorithm, key, data, iv, tag, aad?): string
+```
+
+### openssl.hash
+
+Compute a one-shot hash digest. Returns an empty string on failure.
+
+```lua
+---@param algorithm string
+---@param data string|integer[]
+function openssl.hash(algorithm, data): string
+```
+
+### openssl.hmac
+
+Compute a keyed HMAC. Returns an empty string on failure.
+
+```lua
+---@param algorithm string
+---@param key string|integer[]
+---@param data string|integer[]
+function openssl.hmac(algorithm, key, data): string
+```
+
+### openssl.rand
+
+Generate cryptographically secure random bytes. Returns an empty string on failure.
+
+```lua
+---@param size integer
+function openssl.rand(size): string
+```
+
+### openssl.base64\_encode
+
+Encode binary data to a base64 string.
+
+```lua
+---@param data string|integer[]
+function openssl.base64_encode(data): string
+```
+
+### openssl.base64\_decode
+
+Decode a base64 string to binary data. Returns an empty string on failure.
+
+```lua
+---@param data string
+function openssl.base64_decode(data): string
+```
+
+### openssl.hex\_encode
+
+Encode binary data to a lowercase hex string.
+
+```lua
+---@param data string|integer[]
+function openssl.hex_encode(data): string
+```
+
+### openssl.hex\_decode
+
+Decode a hex string to binary data. Returns an empty string on failure.
+
+```lua
+---@param data string
+function openssl.hex_decode(data): string
+```
+
+### openssl.dh\_new
+
+Create a new Diffie-Hellman context with generated parameters. Returns `nil` on failure.
+
+::: warning
+Generating parameters is slow (seconds for 2048-bit). Use `openssl.dh_group()` with pre-computed parameters instead when possible.
+:::
+
+```lua
+---@param prime_bits? integer
+---@param generator? integer
+function openssl.dh_new(prime_bits?, generator?): dh_context|nil
+```
+
+### openssl.dh\_group
+
+Create a Diffie-Hellman context from pre-computed RFC parameters. Returns `nil` on failure.
+
+```lua
+---@param group string
+function openssl.dh_group(group): dh_context|nil
+```
+
+Available groups: `rfc5114_1024_160`, `rfc5114_2048_224`, `rfc5114_2048_256`
+
+## Types
+
+### dh\_context
+
+```lua
+function dh_context:get_p(): string
+
+function dh_context:get_g(): string
+
+function dh_context:generate_key(): bool
+
+function dh_context:get_public_key(): string
+
+---@param peer_public_key string|integer[]
+function dh_context:compute_key(peer_public_key): string
+```
+
+## Algorithms
+
+### Ciphers
+
+| Name | Key Size | IV Size | Notes |
+| --- | --- | --- | --- |
+| `aes-128-cbc` | 16 | 16 | |
+| `aes-128-ecb` | 16 | 0 | No IV needed |
+| `aes-128-cfb` | 16 | 16 | |
+| `aes-128-ofb` | 16 | 16 | |
+| `aes-128-ctr` | 16 | 16 | |
+| `aes-128-gcm` | 16 | 12 | Use `encrypt_gcm`/`decrypt_gcm` |
+| `aes-192-cbc` | 24 | 16 | |
+| `aes-192-ecb` | 24 | 0 | No IV needed |
+| `aes-192-cfb` | 24 | 16 | |
+| `aes-192-ofb` | 24 | 16 | |
+| `aes-192-ctr` | 24 | 16 | |
+| `aes-192-gcm` | 24 | 12 | Use `encrypt_gcm`/`decrypt_gcm` |
+| `aes-256-cbc` | 32 | 16 | |
+| `aes-256-ecb` | 32 | 0 | No IV needed |
+| `aes-256-cfb` | 32 | 16 | |
+| `aes-256-ofb` | 32 | 16 | |
+| `aes-256-ctr` | 32 | 16 | |
+| `aes-256-gcm` | 32 | 12 | Use `encrypt_gcm`/`decrypt_gcm` |
+| `bf-cbc` | 16 | 8 | Blowfish |
+| `bf-ecb` | 16 | 0 | Blowfish, no IV needed |
+| `bf-cfb` | 16 | 8 | Blowfish |
+| `bf-ofb` | 16 | 8 | Blowfish |
+| `rc4` | 16 | 0 | Stream cipher, no IV needed |
+
+### Digests
+
+| Name | Output Size |
+| --- | --- |
+| `md5` | 16 |
+| `sha1` | 20 |
+| `sha224` | 28 |
+| `sha256` | 32 |
+| `sha384` | 48 |
+| `sha512` | 64 |
+
+## Examples
+
+### Error handling
+
+```lua
+local encrypted = openssl.encrypt('aes-256-cbc', 'short_key', 'data', '1234567890123456')
+if not openssl.success() then
+  print('error: ' .. openssl.last_error())
+  return
+end
+```
+
+### Hashing
+
+```lua
+-- sha256 hash as hex
+local digest = openssl.hash('sha256', 'hello world')
+print(openssl.hex_encode(digest))
+
+-- md5 hash
+local md5 = openssl.hex_encode(openssl.hash('md5', 'hello'))
+```
+
+### Hashing with byte array input
+
+```lua
+local bytes = { 0x68, 0x65, 0x6c, 0x6c, 0x6f }
+local digest = openssl.hash('sha256', bytes)
+print(openssl.hex_encode(digest))
+```
+
+### HMAC
+
+```lua
+local mac = openssl.hmac('sha256', 'secret_key', 'message')
+print(openssl.hex_encode(mac))
+```
+
+### AES-256-CBC encryption
+
+```lua
+local key = openssl.rand(32) -- 256-bit key
+local iv = openssl.rand(16)  -- 128-bit IV
+
+local encrypted = openssl.encrypt('aes-256-cbc', key, 'hello world', iv)
+if not openssl.success() then
+  print(openssl.last_error())
+  return
+end
+
+local decrypted = openssl.decrypt('aes-256-cbc', key, encrypted, iv)
+print(decrypted) -- 'hello world'
+```
+
+### AES-256-GCM authenticated encryption
+
+```lua
+local key = openssl.rand(32)
+local iv = openssl.rand(12)
+
+local result = openssl.encrypt_gcm('aes-256-gcm', key, 'secret data', iv)
+if not openssl.success() then
+  print(openssl.last_error())
+  return
+end
+
+local plaintext = openssl.decrypt_gcm('aes-256-gcm', key, result.data, iv, result.tag)
+print(plaintext) -- 'secret data'
+```
+
+### Blowfish encryption
+
+```lua
+local key = openssl.rand(16)
+local iv = openssl.rand(8)
+
+local encrypted = openssl.encrypt('bf-cbc', key, 'hello', iv)
+local decrypted = openssl.decrypt('bf-cbc', key, encrypted, iv)
+```
+
+### RC4 stream cipher
+
+```lua
+local key = openssl.rand(16)
+local encrypted = openssl.encrypt('rc4', key, 'hello')
+local decrypted = openssl.decrypt('rc4', key, encrypted)
+```
+
+### Encrypt with byte array key
+
+```lua
+local key = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+              0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f }
+local encrypted = openssl.encrypt('aes-128-ecb', key, 'hello world')
+```
+
+### Diffie-Hellman key exchange
+
+```lua
+-- use pre-computed parameters (fast)
+local alice = openssl.dh_group('rfc5114_2048_256')
+local bob = openssl.dh_group('rfc5114_2048_256')
+
+alice:generate_key()
+bob:generate_key()
+
+local alice_pub = alice:get_public_key()
+local bob_pub = bob:get_public_key()
+
+-- both derive the same shared secret
+local alice_secret = alice:compute_key(bob_pub)
+local bob_secret = bob:compute_key(alice_pub)
+-- alice_secret == bob_secret
+```
+
+### Base64 and hex encoding
+
+```lua
+local encoded = openssl.base64_encode('hello world')
+print(encoded) -- 'aGVsbG8gd29ybGQ='
+
+local decoded = openssl.base64_decode(encoded)
+print(decoded) -- 'hello world'
+
+local hex = openssl.hex_encode('\xff\x00\xab')
+print(hex) -- 'ff00ab'
+
+local bytes = openssl.hex_decode('ff00ab')
+```
