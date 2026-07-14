@@ -1,0 +1,1238 @@
+Lexis Lua API Documentation - Single-File Structured Export
+Source: https://docs.lexis.re/
+Retrieved: 2026-07-07
+
+Note: The docs site advertises /llms.txt and /llms-full.txt as Markdown/LLM-oriented documentation bundles. This file is a structured, single-file API reference compiled from the visible documentation pages. It is not a verbatim mirror of every prose example; it preserves the API inventory, source page URLs, signatures, type fields, constants, and important notes in plain text.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. Welcome
+2. Environment
+3. API: Constants
+4. API: Lexis
+5. API: Game
+6. API: Notify
+7. API: Request
+8. API: Util
+9. API: Events
+10. API: Input
+11. API: Regex
+12. API: Math
+13. API: Invoker
+14. API: HTTP
+15. API: SC API
+16. API: Pools
+17. API: Account
+18. API: JSON
+19. API: Paths
+20. API: Dirs
+21. API: File
+22. API: Script
+23. API: Memory
+24. API: GUI
+25. API: Menu
+26. API: Players
+27. API: ROS
+28. API: Models
+29. API: Hook
+30. API: OpenSSL
+
+================================================================================
+1. WELCOME
+================================================================================
+Source: https://docs.lexis.re/
+
+Lexis Lua is the Lua scripting API documented at docs.lexis.re. The site points developers to:
+- /llms.txt for optimized Markdown documentation.
+- /llms-full.txt for the full documentation bundle.
+- natives.lua as a helper collection of game script functions.
+- example projects for additional reference.
+
+================================================================================
+2. ENVIRONMENT
+================================================================================
+Source: https://docs.lexis.re/docs/getting-started/environment/
+
+Purpose: Information about the environment available to a running script.
+
+Permissions:
+Scripts can be loaded with permissions. Some APIs may return empty state or do nothing when permission is missing.
+
+Permission flags:
+- natives: Calling natives
+- global_read: Reading script globals
+- global_write: Writing script globals
+- local_read: Reading script locals
+- local_write: Writing script locals
+- memory_read: Reading game memory
+- memory_write: Writing game memory
+- https: Sending web requests
+- file_read: Reading files
+- file_write: Writing files
+- stat_read: Reading stats
+- stat_write: Writing stats
+- transactions: Running transactions
+
+JOAAT:
+- joaat(text) can be used for game-native hash generation.
+
+================================================================================
+3. API: CONSTANTS
+================================================================================
+Source: https://docs.lexis.re/docs/api/constants/
+
+Common constants exposed to Lua scripts.
+
+node_data_type:
+- node_data_type.int8
+- node_data_type.int16
+- node_data_type.int32
+- node_data_type.int64
+- node_data_type.uint8
+- node_data_type.uint16
+- node_data_type.uint32
+- node_data_type.uint64
+- node_data_type.float
+- node_data_type.double
+- node_data_type.bool
+- node_data_type.vec2
+- node_data_type.vec3
+- node_data_type.bytes
+
+net_object:
+- net_object.automobile
+- net_object.bike
+- net_object.boat
+- net_object.door
+- net_object.heli
+- net_object.object
+- net_object.ped
+- net_object.pickup
+- net_object.pickup_placement
+- net_object.plane
+- net_object.submarine
+- net_object.player
+- net_object.trailer
+- net_object.train
+
+data_node:
+- data_node.automobile_creation
+- data_node.bike_game_state
+- data_node.boat_game_state
+- data_node.door_creation
+- data_node.door_movement
+- data_node.door_script_game_state
+- data_node.door_script_info
+- data_node.dynamic_entity_game_state
+- data_node.entity_orientation
+- data_node.entity_script_game_state
+- data_node.entity_script_info
+- data_node.global_flags
+- data_node.heli_control
+- data_node.heli_health
+- data_node.migration
+- data_node.object_creation
+- data_node.object_game_state
+- data_node.object_orientation
+- data_node.object_script_game_state
+- data_node.object_sector_pos
+- data_node.patrol
+- data_node.ped_ai_data
+- data_node.ped_appearance
+- data_node.ped_attach
+- data_node.ped_component_reservation
+- data_node.ped_creation
+- data_node.ped_game_state
+- data_node.ped_health
+- data_node.ped_inventory
+- data_node.ped_movement
+- data_node.ped_movement_group
+- data_node.ped_orientation
+- data_node.ped_script_creation
+- data_node.ped_script_game_state
+- data_node.ped_sector_pos_map
+- data_node.ped_sector_pos_nav_mesh
+- data_node.ped_task_sequence
+- data_node.ped_task_specific
+- data_node.ped_task_tree
+- data_node.physical_ang_velocity
+- data_node.physical_attach
+- data_node.physical_game_state
+- data_node.physical_health
+- data_node.physical_migration
+- data_node.physical_script_game_state
+- data_node.physical_script_migration
+- data_node.physical_velocity
+- data_node.pickup_creation
+- data_node.pickup_placement_creation
+- data_node.pickup_placement_state
+- data_node.pickup_script_game_state
+- data_node.pickup_sector_pos
+- data_node.plane_control
+- data_node.plane_game_state
+- data_node.player_ambient_model_streaming
+- data_node.player_appearance
+- data_node.player_camera
+- data_node.player_creation
+- data_node.player_extended_game_state
+- data_node.player_game_state
+- data_node.player_gamer
+- data_node.player_ped_group
+- data_node.player_sector_pos
+- data_node.player_wanted_and_los
+- data_node.sector
+- data_node.sector_position
+- data_node.submarine_control
+- data_node.submarine_game_state
+- data_node.train_game_state
+- data_node.vehicle_ang_velocity
+- data_node.vehicle_appearance
+- data_node.vehicle_component_reservation
+- data_node.vehicle_control
+- data_node.vehicle_creation
+- data_node.vehicle_damage_status
+- data_node.vehicle_gadget
+- data_node.vehicle_game_state
+- data_node.vehicle_health
+- data_node.vehicle_proximity_migration
+- data_node.vehicle_script_game_state
+- data_node.vehicle_steering
+- data_node.vehicle_task
+
+================================================================================
+4. API: LEXIS
+================================================================================
+Source: https://docs.lexis.re/docs/api/lexis/
+
+Reference for the lexis API.
+
+Functions:
+- function lexis.username(): string
+  Returns the Lexis username.
+- function lexis.version(): string
+  Returns the Lexis version string, e.g. 10.1.0.
+
+================================================================================
+5. API: GAME
+================================================================================
+Source: https://docs.lexis.re/docs/api/game/
+
+Reference for the game API.
+
+Functions:
+- function game.is_session_free_roam(): bool
+  Checks whether the current session is free roam rather than a mission.
+- function game.in_game(): bool
+  Checks whether the game is currently loaded.
+- function game.net_obj_from_id(net_id): memory_address
+  Parameters: net_id integer.
+  Gets a network object address from an entity net ID.
+- function game.net_obj_from_entity(entity): memory_address
+  Parameters: entity integer.
+  Gets a network object address from an entity handle.
+- function game.update_net_obj_owner(entity, new_owner_player_id): bool
+  Parameters: entity integer; new_owner_player_id integer.
+  Updates an entity owner.
+- function game.entity_from_guid(entity): memory_address
+  Parameters: entity integer.
+  Gets an entity address from an entity handle.
+- function game.guid_from_entity(entity): integer
+  Parameters: entity integer|memory_address.
+  Gets an entity handle from an entity address.
+- function game.send_friend_request(rockstar_id): nil
+  Parameters: rockstar_id integer.
+  Sends a friend request to an account.
+- function game.is_sc_ui_showing(): bool
+  Checks whether the Social Club UI is open.
+- function game.is_transaction_busy(): bool
+  Checks whether a basket transaction is processing.
+- function game.sync_tree(type): memory_address
+  Parameters: type net_object|integer.
+  Gets a sync tree address for a net object type 0-13.
+- function game.state(): integer
+  Gets the current game state.
+- function game.resolution(): vec2
+  Gets the game window resolution.
+- function game.delta(): number
+  Gets the game delta.
+- function game.host(): player
+  Gets the session host as a player.
+- function game.basket_transaction(category, action, destination, items): nil
+  Parameters: category integer; action integer; destination integer; items table[] with id, extra_inventory_id, price, stat, quantity.
+  Processes a basket transaction.
+- function game.invite_rockstar_id(rockstar_id): nil
+  Parameters: rockstar_id integer|integer[].
+  Invites one or more Rockstar IDs to the session.
+- function game.get_model_info(model): memory_address
+  Parameters: model string|integer.
+  Gets model info address from a model.
+- function game.is_ptfx_playing_at_coords(asset, effect, coords, radius?): bool
+  Parameters: asset string; effect string; coords vec3; radius? number.
+  Checks whether a particle effect is playing at a position.
+- function game.network_unregister_entity(handle, locally?): nil
+  Parameters: handle integer; locally? boolean.
+  Force deletes an entity on the network.
+- function game.local_unregister_entity(handle): nil
+  Parameters: handle integer.
+  Force deletes an entity locally.
+- function game.version(): string
+  Returns the game version string.
+- function game.online_version(): string
+  Returns the online version string.
+- function game.build(): string
+  Returns the game build, such as Legacy or Enhanced.
+
+================================================================================
+6. API: NOTIFY
+================================================================================
+Source: https://docs.lexis.re/docs/api/notify/
+
+Reference for the notify API.
+
+Functions:
+- function notify.push(title, desc, options?): nil
+  Parameters: title string; desc string; options? { time: number, icon: notify.icon }.
+  Adds a notification to the queue.
+- function notify.clear(): nil
+  Clears the notification queue.
+
+Constants: notify.icon
+- notify.icon.info
+- notify.icon.modder
+- notify.icon.player_join
+- notify.icon.player_leave
+- notify.icon.protections
+- notify.icon.spawner
+- notify.icon.hotkey
+- notify.icon.hazard
+- notify.icon.player_spawn
+- notify.icon.spoofing
+- notify.icon.join_failed
+- notify.icon.join_blocking
+- notify.icon.tracking
+
+================================================================================
+7. API: REQUEST
+================================================================================
+Source: https://docs.lexis.re/docs/api/request/
+
+Reference for the request API.
+Warning: These calls are blocking; the docs recommend calling them inside a thread or job.
+
+Functions:
+- function request.control(entity, force_ownership?): bool
+  Parameters: entity integer; force_ownership? bool.
+  Requests control of an entity.
+- function request.model(model): bool
+  Parameters: model string|integer.
+  Requests a model to be loaded.
+- function request.weapon(model): bool
+  Parameters: model string|integer.
+  Requests a weapon to be loaded.
+- function request.dict(dictionary): bool
+  Parameters: dictionary string.
+  Requests a dictionary to be loaded.
+- function request.anim(animation): bool
+  Parameters: animation string.
+  Requests an animation to be loaded.
+- function request.particle(particle): bool
+  Parameters: particle string.
+  Requests a particle asset to be loaded.
+
+================================================================================
+8. API: UTIL
+================================================================================
+Source: https://docs.lexis.re/docs/api/util/
+
+Reference for the util API.
+Tip: Yielding at the end of a thread or job is not necessary.
+
+Functions:
+- function util.create_thread(callback): integer
+  Parameters: callback function().
+  Creates a per-frame thread and returns a thread ID.
+- function util.remove_thread(id): nil
+  Parameters: id integer.
+  Removes a thread by ID.
+- function util.create_job(callback): nil
+  Parameters: callback function().
+  Creates a one-shot job.
+- function util.yield(time_ms?): nil
+  Parameters: time_ms? integer.
+  Yields the current callback, optionally for a duration.
+- function util.get_tick_count(): integer
+  Returns the GetTickCount-style tick count.
+- function util.str_split(str, delimiter): string[]
+  Parameters: str string; delimiter string.
+  Splits a string into tokens.
+- function util.str_random(length): string
+  Parameters: length integer.
+  Returns a random string.
+- function util.str_bytes(str): integer[]
+  Parameters: str string.
+  Converts a hex string to bytes.
+- function util.number_bytes(num): integer[]
+  Parameters: num integer.
+  Converts a 4-byte integer to little-endian bytes.
+- function util.random_int(min, max): integer
+  Parameters: min integer; max integer.
+  Returns a random integer in range.
+- function util.random_float(min, max): number
+  Parameters: min number; max number.
+  Returns a random float in range.
+
+================================================================================
+9. API: EVENTS
+================================================================================
+Source: https://docs.lexis.re/docs/api/events/
+
+Reference for the events API.
+
+Functions:
+- function events.subscribe(type, callback): integer
+  Parameters: type events.event; callback function(data).
+  Registers a callback and returns a callback ID.
+- function events.unsubscribe(id): nil
+  Parameters: id integer.
+  Removes a callback by ID.
+- function events.get(id): event
+  Parameters: id integer.
+  Gets an event object for a callback ID.
+
+Types:
+- event fields: enabled bool; fn function.
+- player_join fields: player player; slot integer.
+- player_leave fields: player player; slot integer.
+- player_flagged fields: player player; reason string.
+- log fields: text string; color color; prefix string; time string.
+- scroll fields: offset number.
+- key_press fields: key integer.
+- char_press fields: char string.
+
+Constants: events.event
+- events.event.player_join
+- events.event.player_leave
+- events.event.player_flagged
+- events.event.log
+- events.event.scroll
+- events.event.key_press
+- events.event.char_press
+
+================================================================================
+10. API: INPUT
+================================================================================
+Source: https://docs.lexis.re/docs/api/input/
+
+Reference for the input API.
+
+Functions:
+- function input.show_cursor(show): nil
+  Parameters: show bool.
+  Shows or hides the mouse cursor.
+- function input.disable_input(disable): nil
+  Parameters: disable bool.
+  Enables or disables Lexis input.
+- function input.key(vk): input_keyboard_state
+  Parameters: vk integer.
+  Gets keyboard key state.
+- function input.mouse(vk): input_mouse_state
+  Parameters: vk integer.
+  Gets mouse button state.
+- function input.pad(key): input_pad_state
+  Parameters: key integer.
+  Gets controller key state.
+- function input.mouse_position(): vec2
+  Gets mouse cursor position.
+- function input.is_mouse_within(position, scale): bool
+  Parameters: position vec2; scale vec2.
+  Checks whether the mouse is within bounds.
+- function input.get_clipboard_text(): string
+  Reads clipboard text.
+- function input.set_clipboard_text(str): nil
+  Parameters: str string.
+  Sets clipboard text.
+
+Types:
+- input_keyboard_state fields: pressed bool; just_pressed bool; just_released bool; name string.
+- input_mouse_state fields: double_clicked bool; pressed bool; just_pressed bool; just_released bool; name string.
+- input_pad_state fields: pressed bool; just_pressed bool; just_released bool.
+
+================================================================================
+11. API: REGEX
+================================================================================
+Source: https://docs.lexis.re/docs/api/regex/
+
+Reference for the regex API.
+
+Functions:
+- function regex(pattern): regex
+  Parameters: pattern string.
+  Creates a regex instance.
+
+Types:
+- function regex:find_all(subject): string[][]
+  Parameters: subject string.
+
+================================================================================
+12. API: MATH
+================================================================================
+Source: https://docs.lexis.re/docs/api/math/
+
+Reference for math vector constructors and types.
+
+Functions:
+- function vec2(): vec2
+- function vec2(xy): vec2
+  Parameters: xy number.
+- function vec2(x, y): vec2
+  Parameters: x number; y number.
+- function vec3(): vec3
+- function vec3(xyz): vec3
+  Parameters: xyz number.
+- function vec3(x, y, z): vec3
+  Parameters: x number; y number; z number.
+- function scr_vec3(): scr_vec3
+- function scr_vec3(xyz): scr_vec3
+  Parameters: xyz number.
+- function scr_vec3(x, y, z): scr_vec3
+  Parameters: x number; y number; z number.
+
+Types:
+- vec2 fields: x number; y number.
+  Methods:
+  - function vec2:normalize(): vec2
+  - function vec2:dot(other): number; other vec2.
+- vec3 fields: x number; y number; z number.
+  Methods:
+  - function vec3:normalize(): vec3
+  - function vec3:dir(): vec3
+  - function vec3:dot(other): number; other vec3.
+  - function vec3:distance3d(other): number; other vec3.
+- scr_vec3 fields: x number; y number; z number.
+  Methods:
+  - function scr_vec3:normalize(): scr_vec3
+  - function scr_vec3:dir(): scr_vec3
+  - function scr_vec3:dot(other): number; other scr_vec3.
+  - function scr_vec3:distance3d(other): number; other scr_vec3.
+
+================================================================================
+13. API: INVOKER
+================================================================================
+Source: https://docs.lexis.re/docs/api/invoker/
+
+Reference for the invoker API.
+
+Functions:
+- function invoker.call(hash, args?): native_invoke
+  Parameters: hash integer; args? variadic.
+  Invokes a native.
+
+Types:
+- native_invoke fields: int integer; int64 integer; float number; bool bool; str string; address memory_address; scr_vec3 scr_vec3; params scr_value.
+
+================================================================================
+14. API: HTTP
+================================================================================
+Source: https://docs.lexis.re/docs/api/http/
+
+Reference for the http API.
+Warning: fetch is blocking.
+
+Functions:
+- function http.fetch(url, options): http_result
+  Parameters: url string; options { method: string, headers: table<string,string>[], body: string|integer[]|json }.
+  Fetches data from a URL.
+- function http.fetch_async(url, options, callback): bool
+  Parameters: url string; options { method: string, headers: table<string,string>[], body: string|integer[]|json }; callback function(http_result).
+  Fetches data asynchronously.
+
+Types:
+- http_result fields: success bool; status integer; error integer; headers table<string,string>[]; body integer[]; text string; json table.
+
+================================================================================
+15. API: SC API
+================================================================================
+Source: https://docs.lexis.re/docs/api/scapi/
+
+Reference for the scapi API.
+Warning: query is blocking; the docs recommend calling it inside a thread or job.
+
+Functions:
+- function scapi.query(rid): scapi_rockstar_account
+  Parameters: rid integer.
+  Fetches account data by Rockstar ID.
+- function scapi.query(name, page?): scapi_account_pagination
+  Parameters: name string; page? integer.
+  Fetches paginated account data by name.
+
+Types:
+- scapi_rockstar_account fields: name string; rid integer; success bool.
+- scapi_result_info fields: total integer; next_page integer; query string.
+- scapi_account_pagination fields: accounts scapi_rockstar_account[]; paged scapi_result_info; success bool.
+
+================================================================================
+16. API: POOLS
+================================================================================
+Source: https://docs.lexis.re/docs/api/pools/
+
+Reference for the pools API.
+
+Functions:
+- function pools.ped(require_valid_guid?): memory_address[]
+  Parameters: require_valid_guid? bool.
+  Lists ped memory addresses.
+- function pools.object(require_valid_guid?): memory_address[]
+  Parameters: require_valid_guid? bool.
+  Lists object memory addresses.
+- function pools.vehicle(require_valid_guid?): memory_address[]
+  Parameters: require_valid_guid? bool.
+  Lists vehicle memory addresses.
+- function pools.weapon(require_valid_guid?): memory_address[]
+  Parameters: require_valid_guid? bool.
+  Lists weapon memory addresses.
+- function pools.pickup(require_valid_guid?): memory_address[]
+  Parameters: require_valid_guid? bool.
+  Lists pickup memory addresses.
+
+================================================================================
+17. API: ACCOUNT
+================================================================================
+Source: https://docs.lexis.re/docs/api/account/
+
+Reference for the account API.
+
+Functions:
+- function account.character(): integer
+  Returns the active character.
+- function account.name(): string
+  Returns the account name.
+- function account.rockstar_id(): integer
+  Returns the account Rockstar ID.
+- function account.stats(name): stat
+  Parameters: name string|integer.
+  Creates or accesses a stat object.
+
+Types:
+- stat fields: str string; int32 integer; int64 integer; uint8 integer; uint16 integer; uint32 integer; uint64 integer; float number; bool bool.
+
+================================================================================
+18. API: JSON
+================================================================================
+Source: https://docs.lexis.re/docs/api/json/
+
+Reference for the json API.
+
+Functions:
+- function json.encode(data): json
+  Parameters: data table.
+  Encodes a table to a json instance.
+- function json.decode(json): table
+  Parameters: json json.
+  Decodes a json instance to a Lua table.
+
+Types:
+- function json:dump(indent?): string
+  Parameters: indent? integer.
+
+================================================================================
+19. API: PATHS
+================================================================================
+Source: https://docs.lexis.re/docs/api/paths/
+
+Reference for the paths API.
+
+Constants:
+- paths.cheat
+- paths.game
+- paths.script
+
+================================================================================
+20. API: DIRS
+================================================================================
+Source: https://docs.lexis.re/docs/api/dirs/
+
+Reference for the dirs API.
+Warning: Paths are limited to the Lexis folder.
+
+Functions:
+- function dirs.list(path, extension?): string[]
+  Parameters: path string; extension? string.
+  Lists files in a directory.
+- function dirs.scan(path): string[]
+  Parameters: path string.
+  Lists directories in a directory.
+- function dirs.exists(path): bool
+  Parameters: path string.
+  Checks whether a directory exists.
+- function dirs.remove(path): bool
+  Parameters: path string.
+  Deletes a directory.
+- function dirs.create(path): bool
+  Parameters: path string.
+  Creates a directory.
+
+================================================================================
+21. API: FILE
+================================================================================
+Source: https://docs.lexis.re/docs/api/file/
+
+Reference for the file API.
+Warning: Paths are limited to the Lexis folder.
+
+Functions:
+- function file.exists(path): bool
+  Parameters: path string.
+  Checks whether a file exists.
+- function file.remove(path): bool
+  Parameters: path string.
+  Deletes a file.
+- function file.open(path, options): file
+  Parameters: path string; options { append: bool, create_if_not_exists: bool }.
+  Opens a file handle.
+
+Types:
+- file fields: valid bool; text string; json json.
+
+================================================================================
+22. API: SCRIPT
+================================================================================
+Source: https://docs.lexis.re/docs/api/script/
+
+Reference for the script API.
+
+Functions:
+- function script.running(name): bool
+  Parameters: name string|integer.
+  Checks whether a script is running.
+- function script.globals(base): script_global
+  Parameters: base integer.
+  Creates a script_global instance.
+- function script.tunables(name): tunables
+  Parameters: name string|integer.
+  Creates a tunables instance.
+- function script.locals(name, base): script_local
+  Parameters: name string|integer; base integer.
+  Creates a script_local instance.
+- function script.program(name): memory_address
+  Parameters: name string|integer.
+  Gets script program memory address by name.
+- function script.host(name): player
+  Parameters: name string.
+  Gets the host player for a script.
+- function script.force_host(script): bool
+  Parameters: script string|integer.
+  Forces script host.
+- function script.call(name, position, args): memory_address
+  Parameters: name string|integer; position integer; args table.
+  Calls a script function by offset.
+- function script.patch(name, position, offset, bytes): script_patch
+  Parameters: name string|integer; position integer; offset integer; bytes integer[].
+  Creates a script patch.
+- function script.execute_as(name, callback): nil
+  Parameters: name string|integer; callback function.
+  Runs a callback as a script.
+
+Types:
+- script_global fields: address memory_address; vec2 vec2; vec3 scr_vec3; int8 integer; int16 integer; int32 integer; int64 integer; uint8 integer; uint16 integer; uint32 integer; uint64 integer; float number; double number; bool bool; str string.
+  Methods:
+  - function script_global:at(index): script_global
+  - function script_global:at(index, size): script_global
+- script_local fields: address memory_address; vec2 vec2; vec3 scr_vec3; int8 integer; int16 integer; int32 integer; int64 integer; uint8 integer; uint16 integer; uint32 integer; uint64 integer; float number; double number; bool bool; str string.
+  Methods:
+  - function script_local:at(index): script_local
+  - function script_local:at(index, size): script_local
+- script_patch fields: enabled bool; original integer[]; patch integer[].
+  Methods:
+  - function script_patch:enable(): nil
+  - function script_patch:disable(): nil
+- tunables fields: int8 integer; int16 integer; int32 integer; int64 integer; uint8 integer; uint16 integer; uint32 integer; uint64 integer; float number; double number; bool bool.
+
+================================================================================
+23. API: MEMORY
+================================================================================
+Source: https://docs.lexis.re/docs/api/memory/
+
+Reference for the memory API.
+
+Functions:
+- function memory.base(): integer
+  Returns game base address.
+- function memory.size(): integer
+  Returns game memory size.
+- function memory.alloc(size): memory_allocated
+  Parameters: size integer.
+  Allocates memory.
+- function memory.scan(signature, module?): memory_address
+  Parameters: signature string; module? string.
+  Scans memory for a signature.
+
+Types:
+- pointer_int fields: value integer.
+  Constructor/methods: function pointer_int(count?): pointer_int; function pointer_int:free(): nil; function pointer_int:address(): memory_address.
+- pointer_bool fields: value bool.
+  Constructor/methods: function pointer_bool(count?): pointer_bool; function pointer_bool:free(): nil; function pointer_bool:address(): memory_address.
+- pointer_float fields: value number.
+  Constructor/methods: function pointer_float(count?): pointer_float; function pointer_float:free(): nil; function pointer_float:address(): memory_address.
+- pointer_scr_value fields: value scr_value.
+  Constructor/methods: function pointer_scr_value(count?): pointer_scr_value; function pointer_scr_value:free(): nil; function pointer_scr_value:address(): memory_address.
+- pointer_vec3 fields: value vec3.
+  Constructor/methods: function pointer_vec3(count?): pointer_vec3; function pointer_vec3:free(): nil; function pointer_vec3:address(): memory_address.
+- pointer_scr_vec3 fields: value scr_vec3.
+  Constructor/methods: function pointer_scr_vec3(count?): pointer_scr_vec3; function pointer_scr_vec3:free(): nil; function pointer_scr_vec3:address(): memory_address.
+- memory_address fields: value integer; int8 integer; as_int8 integer; int16 integer; as_int16 integer; int32 integer; as_int32 integer; int64 integer; as_int64 integer; uint8 integer; as_uint8 integer; uint16 integer; as_uint16 integer; uint32 integer; as_uint32 integer; uint64 integer; as_uint64 integer; float number; as_float number; double number; as_double number; bool bool; as_bool bool; ptr memory_address; as_ptr memory_address; scr_vec3 scr_vec3; as_scr_vec3 scr_vec3; vec2 vec2; as_vec2 vec2; vec3 vec3; as_vec3 vec3; str string; as_str string.
+  Methods:
+  - function memory_address:nop(count?): nil
+  - function memory_address:add(offset): memory_address
+  - function memory_address:sub(offset): memory_address
+  - function memory_address:rip(op_size?, insn_size?): memory_address
+- scr_value fields: int32 integer; uint32 integer; uint64 integer; float number; bool bool; str string; ref scr_value.
+- memory_allocated methods: function memory_allocated:free(): nil.
+
+================================================================================
+24. API: GUI
+================================================================================
+Source: https://docs.lexis.re/docs/api/gui/
+
+Reference for the gui API.
+
+Functions:
+- function gui.push_clip(pos, scale): nil
+  Parameters: pos vec2; scale vec2.
+  Pushes a clipping rectangle.
+- function gui.pop_clip(): nil
+  Pops a clipping rectangle.
+- function gui.line(from, to, thickness, color): nil
+  Parameters: from vec2; to vec2; thickness number; color color.
+- function gui.circle(pos, radius, color): nil
+  Parameters: pos vec2; radius number; color color.
+- function gui.image(texture, pos, scale, color): nil
+  Parameters: texture texture; pos vec2; scale vec2; color color.
+- function gui.image_rounded(texture, pos, scale, color, rounding?, flags?): nil
+  Parameters: texture texture; pos vec2; scale vec2; color color; rounding number; flags gui.rounding|integer.
+- function gui.image_rotated(texture, pos, scale, color, degrees): nil
+  Parameters: texture texture; pos vec2; scale vec2; color color; degrees number.
+- function gui.rebuild(): nil
+  Rebuilds the font atlas.
+- function gui.load_image(path): texture
+  Parameters: path string.
+- function gui.load_font(path, scale): font
+  Parameters: path string; scale number.
+- function gui.text(str): text
+  Parameters: str string.
+- function gui.rect(pos, scale): rect
+  Parameters: pos vec2; scale vec2.
+- function gui.text_size(text, scale, options?): vec2
+  Parameters: text string; scale number; options? { wrap: number, font: font }.
+
+Types:
+- text methods: draw, get_size, position(pos), color(color), wrap(wrap), scale(scale), justify(justify), font(font).
+- rect methods: draw, filled, color(color), outline(thickness, color), rounding(rounding, flags?), multicolors(upr_left, upr_right, bot_right, bot_left).
+- color fields: r integer; g integer; b integer; rf number; gf number; bf number.
+- texture fields: scale vec2; name string; path string.
+- font fields: scale number; path string.
+
+Constants:
+- gui.justify.left
+- gui.justify.center
+- gui.justify.right
+- gui.rounding.top_left
+- gui.rounding.top_right
+- gui.rounding.bottom_left
+- gui.rounding.bottom_right
+
+================================================================================
+25. API: MENU
+================================================================================
+Source: https://docs.lexis.re/docs/api/menu/
+
+Reference for the menu API.
+Tip: Combo and number options have indexed states when added in a player root.
+
+Functions:
+- function menu.root(): submenu
+  Gets the script's submenu under Scripts.
+- function menu.player_root(): submenu
+  Gets the script submenu for each player.
+- function menu.find(path): option
+  Parameters: path string.
+  Finds an option by hierarchy path.
+- function menu.iter(): menu_node[]
+  Returns the option tree.
+- function menu.type_of(object): string
+  Parameters: object option.
+  Returns an option object's type name or unknown.
+
+Types:
+- menu_node fields: name string; handle option; options menu_node[]?.
+- submenu fields: first_option_index integer; options option[].
+  Methods:
+  - function submenu:submenu(name, insert_at?): submenu
+  - function submenu:toggle(name, insert_at?): toggle
+  - function submenu:hotkey(name, key?, insert_at?): hotkey
+  - function submenu:textbox(name, insert_at?): textbox
+  - function submenu:button(name, insert_at?): button
+  - function submenu:breaker(name, insert_at?): breaker
+  - function submenu:number_int(name, type?, insert_at?): number_int
+  - function submenu:number_float(name, type?, insert_at?): number_float
+  - function submenu:combo_int(name, values, type, multi?, insert_at?): combo_int
+  - function submenu:combo_float(name, values, type, multi?, insert_at?): combo_float
+  - function submenu:combo_str(name, values, type, multi?, insert_at?): combo_str
+  - function submenu:resize(new_size): nil
+- textbox fields: name string; type menu.type; value string.
+  Methods: tooltip(text), flags(flags), event(event, fn), max_chars(chars), invoke().
+- toggle fields: name string; type menu.type; value bool.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- hotkey fields: name string; type menu.type; value integer.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- breaker fields: name string; type menu.type.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- button fields: name string; type menu.type.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- number_int fields: name string; type menu.type; sub_type menu.sub_type; slider menu.slider; value integer; toggle bool.
+  Methods: tooltip(text), flags(flags), event(event, fn), fmt(fmt, min, max, step?), step(step), invoke().
+- number_float fields: name string; type menu.type; sub_type menu.sub_type; slider menu.slider; value number; toggle bool.
+  Methods: tooltip(text), flags(flags), event(event, fn), fmt(fmt, min, max, step?), step(step), invoke().
+- combo_int fields: name string; type menu.type; sub_type menu.sub_type; slider menu.slider; value integer; toggle bool; list combo_list_int; multi combo_multi_list.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- combo_float fields: name string; type menu.type; sub_type menu.sub_type; slider menu.slider; value number; toggle bool; list combo_list_float; multi combo_multi_list.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- combo_str fields: name string; type menu.type; sub_type menu.sub_type; slider menu.slider; value string; toggle bool; list combo_list_str; multi combo_multi_list.
+  Methods: tooltip(text), flags(flags), event(event, fn), invoke().
+- combo_list_int fields: name string; value integer.
+  Method: function combo_list_int:at(index): combo_list_int.
+- combo_list_float fields: name string; value number.
+  Method: function combo_list_float:at(index): combo_list_float.
+- combo_list_str fields: name string; value string.
+  Method: function combo_list_str:at(index): combo_list_str.
+- combo_multi_list fields: count integer.
+  Methods: is_set(index), set(index, value), is_disabled(index), disable(index, value).
+
+Constants:
+- menu.flags.in_game
+- menu.flags.hotkey
+- menu.flags.host_only
+- menu.flags.scr_host_only
+- menu.flags.risky
+- menu.flags.disabled
+- menu.flags.fake_radio
+- menu.flags.fake_submenu
+- menu.flags.command
+- menu.event.click
+- menu.event.completed
+- menu.event.enter
+- menu.event.leave
+- menu.slider.scroll
+- menu.slider.press
+- menu.slider.toggle
+- menu.type.submenu
+- menu.type.button
+- menu.type.toggle
+- menu.type.color
+- menu.type.number
+- menu.type.combo
+- menu.type.text
+- menu.type.breaker
+- menu.type.radio
+- menu.type.label
+- menu.type.hotkey
+- menu.type.multi_combo
+- menu.sub_type.integer
+- menu.sub_type.floating
+- menu.sub_type.str
+- menu.sub_type.boolean
+- menu.sub_type.vec2
+- menu.sub_type.vec3
+- menu.sub_type.scr_vec3
+- menu.sub_type.color
+
+================================================================================
+26. API: PLAYERS
+================================================================================
+Source: https://docs.lexis.re/docs/api/players/
+
+Reference for the players API.
+
+Functions:
+- function players.me(): player
+  Returns the local player.
+- function players.target(): player
+  Returns the selected Lexis player.
+- function players.is_target_session(): bool
+  Checks whether the current target is the session.
+- function players.get(index): player
+  Parameters: index integer.
+  Gets a player by index.
+- function players.list(): player[]
+  Lists players in the session.
+
+Types:
+- player fields: name string; id integer; ped integer; ped_ptr memory_address; vehicle integer; vehicle_ptr memory_address; weapon_entity integer; weapon_ptr memory_address; entity integer; entity_ptr memory_address; model integer; vehicle_model integer; weapon_model integer; last_synced_model integer; heading number; coords scr_vec3; rotation scr_vec3; cam_rotation scr_vec3; waypoint vec2; net_player memory_address; connected bool; exists bool; alive bool; in_vehicle bool; weapon_in_hand bool; shooting bool; driver bool; aiming bool; active_bounty bool; freemode_host bool; friend bool; controller bool; modder bool; bounty integer; rank integer; cash integer; bank integer; wallet integer; kd number; playtime integer; blacklist integer; force_entity_sync bool; rockstar_id integer; ip_address integer; in_ceo bool; boss bool; host_token integer; in_interior bool; gang_id integer.
+  Methods:
+  - function player:force_sync_node(object, type, node): nil
+    Parameters: object memory_address; type net_object|integer; node data_node|integer.
+  - function player:teleport(coords): nil
+    Parameters: coords vec3|scr_vec3.
+  - function player:script_event(event_hash, params): nil
+    Parameters: event_hash integer; params table.
+  - function player:modify_outgoing_node(type, node, mods): nil
+    Parameters: type net_object|integer; node data_node|integer; mods table.
+
+================================================================================
+27. API: ROS
+================================================================================
+Source: https://docs.lexis.re/docs/api/ros/
+
+Reference for the ros API.
+Warning: Some functions may require being online.
+
+Functions:
+- function ros.find_gamers(activity_id?, lower_limit?, upper_limit?): find_gamer_result[]
+  Parameters: activity_id? integer default 1; lower_limit? number default 0; upper_limit? number default 0.
+- function ros.find_gamers_async(callback, activity_id?, lower_limit?, upper_limit?): nil
+  Parameters: callback function(find_gamer_result[]); activity_id? integer; lower_limit? number; upper_limit? number.
+- function ros.find_sessions(available_slots?, max_results?): find_session_result[]
+  Parameters: available_slots? integer default 1; max_results? integer default 15.
+- function ros.find_sessions_async(callback, available_slots?, max_results?): nil
+  Parameters: callback function(find_session_result[]); available_slots? integer; max_results? integer.
+- function ros.query_session(rockstar_id): query_session_result
+  Parameters: rockstar_id integer.
+- function ros.query_session(rockstar_ids): query_session_result[]
+  Parameters: rockstar_ids integer[].
+- function ros.query_session_async(rockstar_id, callback): nil
+  Parameters: rockstar_id integer; callback function(query_session_result).
+- function ros.query_session_async(rockstar_ids, callback): nil
+  Parameters: rockstar_ids integer[]; callback function(query_session_result[]).
+- function ros.query_stats(rockstar_id, stats): query_stats_result[]
+  Parameters: rockstar_id integer; stats integer[].
+- function ros.query_stats(rockstar_ids, stats): table<integer, query_stats_result[]>[]
+  Parameters: rockstar_ids integer[]; stats integer[].
+- function ros.query_stats_async(rockstar_id, stats, callback)
+  Parameters: rockstar_id integer; stats integer[]; callback function(query_stats_result[]).
+- function ros.query_stats_async(rockstar_ids, stats, callback)
+  Parameters: rockstar_ids integer[]; stats integer[]; callback function(table<integer, query_stats_result[]>[]).
+
+Types:
+- find_gamer_result fields: gsinfo string; name string; rid integer.
+- find_session_result fields: match_id string; owner string; gsinfo string; attributes string.
+- query_session_result fields: rid integer; gstype integer; gsinfo string.
+- query_stats_result fields: hash integer; number integer.
+
+================================================================================
+28. API: MODELS
+================================================================================
+Source: https://docs.lexis.re/docs/api/models/
+
+Reference for the models API.
+
+Functions:
+- function models.peds(limit?): number[]
+  Parameters: limit? integer.
+  Lists ped models.
+- function models.weapons(limit?): number[]
+  Parameters: limit? integer.
+  Lists weapon models.
+- function models.vehicles(limit?): number[]
+  Parameters: limit? integer.
+  Lists vehicle models.
+- function models.vehicles_from_dlc(name): number[]
+  Parameters: name string.
+  Lists vehicle models from a DLC.
+- function models.vehicles_from_class(class): number[]
+  Parameters: class models.vehicle.
+  Lists vehicle models from a vehicle class.
+
+Constants: models.vehicle
+- models.vehicle.compacts
+- models.vehicle.sedans
+- models.vehicle.suvs
+- models.vehicle.coupes
+- models.vehicle.muscle
+- models.vehicle.sports_classics
+- models.vehicle.sports
+- models.vehicle.super
+- models.vehicle.motorcycles
+- models.vehicle.off_road
+- models.vehicle.industrial
+- models.vehicle.utility
+- models.vehicle.vans
+- models.vehicle.cycles
+- models.vehicle.boats
+- models.vehicle.helicopters
+- models.vehicle.planes
+- models.vehicle.service
+- models.vehicle.emergency
+- models.vehicle.military
+- models.vehicle.commercial
+- models.vehicle.trains
+- models.vehicle.open_wheel
+
+Known DLC names listed by the docs:
+- A Safehouse in The Hills
+- Money Fronts
+- Expanded & Enhanced
+- Agents of Sabotage
+- Bottom Dollar Bounties
+- The Chop Shop
+- San Andreas Mercenaries
+- Los Santos Drug Wars
+- The Criminal Enterprises
+- The Contract
+- Los Santos Tuners
+- The Cayo Perico Heist
+- Los Santos Summer
+- The Diamond Casino Heist
+- The Diamond Casino & Resort
+- Arena War
+- After Hours
+- Southern San Andreas Super Sport Series
+- The Doomsday Heist
+- Smuggler's Run
+- Gunrunning
+- Cunning Stunts: Special Vehicle Circuit
+- Import/Export
+- Bikers
+- Cunning Stunts
+- Further Adventures In Finance & Felony
+- Lowriders: Custom Classics
+- Be My Valentine
+- Drop Zone
+- Festive Surprise 2015
+- Executives & Other Criminals
+- Halloween Surprise
+- Lowriders
+- Ill-Gotten Gains Part 2
+- Ill-Gotten Gains Part 1
+- Heists
+- Festive Surprise
+- Last Team Standing
+- San Andreas Flight School
+- Independence Day
+- I'm Not a Hipster
+- The High Life
+- Business
+- Valentine's Day Massacre
+- Beach Bum
+
+================================================================================
+29. API: HOOK
+================================================================================
+Source: https://docs.lexis.re/docs/api/hook/
+
+Reference for the hook API.
+
+Functions:
+- function hook.native(native_hash, script, options): native_hook
+  Parameters: native_hash integer; script string|integer; options { pre: function(native_invoke), post: function(native_invoke) }.
+  Hooks a script native.
+- function hook.script(script, position, options): script_hook
+  Parameters: script string|integer; position integer; options { pre: function(params, params_size, returns, returns_size), post: function(returns, returns_size) }.
+  Hooks a script function.
+
+Types:
+- native_hook fields: enabled bool.
+- script_hook fields: enabled bool.
+
+Constants:
+- hook.scripts.continue
+- hook.scripts.block
+
+================================================================================
+30. API: OPENSSL
+================================================================================
+Source: https://docs.lexis.re/docs/api/openssl/
+
+Reference for the openssl API.
+Tip: Data parameters accept strings and byte arrays. Return values are binary-safe strings. Use hex/base64 encoding to make binary output readable.
+Warning: Functions report errors through empty string or nil returns. Check openssl.success() and openssl.last_error().
+
+Functions:
+- function openssl.success(): bool
+  Returns whether the last openssl call succeeded.
+- function openssl.last_error(): string
+  Returns the last error message or empty string.
+- function openssl.encrypt(algorithm, key, data, iv?): string
+  Parameters: algorithm string; key string|integer[]; data string|integer[]; iv? string|integer[].
+  Symmetric encryption; returns empty string on failure.
+- function openssl.decrypt(algorithm, key, data, iv?): string
+  Parameters: algorithm string; key string|integer[]; data string|integer[]; iv? string|integer[].
+  Symmetric decryption; returns empty string on failure.
+- function openssl.encrypt_gcm(algorithm, key, data, iv, aad?, tag_len?): { data: string, tag: string }|nil
+  Parameters: algorithm string; key string|integer[]; data string|integer[]; iv string|integer[]; aad? string|integer[]; tag_len? integer.
+  GCM-mode authenticated encryption.
+- function openssl.decrypt_gcm(algorithm, key, data, iv, tag, aad?): string
+  Parameters: algorithm string; key string|integer[]; data string|integer[]; iv string|integer[]; tag string|integer[]; aad? string|integer[].
+  GCM-mode authenticated decryption.
+- function openssl.hash(algorithm, data): string
+  Parameters: algorithm string; data string|integer[].
+  One-shot hash digest.
+- function openssl.hmac(algorithm, key, data): string
+  Parameters: algorithm string; key string|integer[]; data string|integer[].
+  Keyed HMAC.
+- function openssl.rand(size): string
+  Parameters: size integer.
+  Cryptographically secure random bytes.
+- function openssl.base64_encode(data): string
+  Parameters: data string|integer[].
+- function openssl.base64_decode(data): string
+  Parameters: data string.
+- function openssl.hex_encode(data): string
+  Parameters: data string|integer[].
+- function openssl.hex_decode(data): string
+  Parameters: data string.
+- function openssl.dh_new(prime_bits?, generator?): dh_context|nil
+  Parameters: prime_bits? integer; generator? integer.
+  Creates a Diffie-Hellman context with generated parameters. Generation can be slow.
+- function openssl.dh_group(group): dh_context|nil
+  Parameters: group string.
+  Creates a Diffie-Hellman context from pre-computed RFC parameters.
+
+Types:
+- dh_context methods:
+  - function dh_context:get_p(): string
+  - function dh_context:get_g(): string
+  - function dh_context:generate_key(): bool
+  - function dh_context:get_public_key(): string
+  - function dh_context:compute_key(peer_public_key): string
+
+Diffie-Hellman groups:
+- rfc5114_1024_160
+- rfc5114_2048_224
+- rfc5114_2048_256
+
+Cipher algorithms:
+- aes-128-cbc: key 16, IV 16
+- aes-128-ecb: key 16, IV 0, no IV needed
+- aes-128-cfb: key 16, IV 16
+- aes-128-ofb: key 16, IV 16
+- aes-128-ctr: key 16, IV 16
+- aes-128-gcm: key 16, IV 12, use encrypt_gcm/decrypt_gcm
+- aes-192-cbc: key 24, IV 16
+- aes-192-ecb: key 24, IV 0, no IV needed
+- aes-192-cfb: key 24, IV 16
+- aes-192-ofb: key 24, IV 16
+- aes-192-ctr: key 24, IV 16
+- aes-192-gcm: key 24, IV 12, use encrypt_gcm/decrypt_gcm
+- aes-256-cbc: key 32, IV 16
+- aes-256-ecb: key 32, IV 0, no IV needed
+- aes-256-cfb: key 32, IV 16
+- aes-256-ofb: key 32, IV 16
+- aes-256-ctr: key 32, IV 16
+- aes-256-gcm: key 32, IV 12, use encrypt_gcm/decrypt_gcm
+- bf-cbc: key 16, IV 8, Blowfish
+- bf-ecb: key 16, IV 0, Blowfish, no IV needed
+- bf-cfb: key 16, IV 8, Blowfish
+- bf-ofb: key 16, IV 8, Blowfish
+- rc4: key 16, IV 0, stream cipher, no IV needed
+
+Digest algorithms:
+- md5: output 16 bytes
+- sha1: output 20 bytes
+- sha224: output 28 bytes
+- sha256: output 32 bytes
+- sha384: output 48 bytes
+- sha512: output 64 bytes
+
+================================================================================
+END OF EXPORT
+================================================================================
